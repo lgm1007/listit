@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 리스팃 (Listit)
 
-## Getting Started
+## 프로젝트 개요
+- 웹 기반 주제별 리스트 공유 플랫폼
 
-First, run the development server:
+## 주요 기능
+- 이미지 + 내용을 포함한 리스트 생성/게시
+- 관심 있는 리스트에 좋아요/댓글 인터랙션
+- 카테고리별 리스트 탐색 (맛집, 여행, 취미, 영화 등)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 기술 스택
+- Next.js 16.1.6 (App Router)
+- TypeScript
+- Tailwind CSS
+- Supabase
+- Supabase Storage
+- Vercel
+
+## 설치 및 실행
 ```
+# 저장소 복제
+git clone https://github.com/lgm1007/listit.git
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# 의존성 설치
+npm install
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# 환경 변수 설정 (최상위 route 경로에 .env.local 파일 추가 후 아래 내용 추가)
+NEXT_PUBLIC_SUPABASE_URL=YOUR_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_KEY
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# 로컬 서버 실행
+npm run dev
+```
