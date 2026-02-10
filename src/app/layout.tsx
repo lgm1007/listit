@@ -14,17 +14,25 @@ export default async function RootLayout({
   const supabase = await createClient()
 
   // 현재 로그인한 사용자의 auth 정보 가져오기
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  if (authError) {
+    console.error('Error getting user auth:', authError.message)
+  }
 
   let userProfile = null
 
   if (user) {
     // auth 정보가 있다면 profiles 테이블에서 닉네임 가져오기
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('username, avatar_url')
       .eq('id', user.id)
       .single()
+
+    if (profileError) {
+      console.error('Error getting profile:', profileError.message)
+    }
 
     userProfile = profile
   }
