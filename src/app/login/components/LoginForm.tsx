@@ -11,6 +11,7 @@ export default function LoginForm() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)   // 에러 메시지 상태 관리
 
     const router = useRouter()
     // 클라이언트용 Supabase 객체 생성 (client.ts는 동기 방식)
@@ -22,40 +23,59 @@ export default function LoginForm() {
     const handleEmailLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
+        setErrorMessage(null)
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        })
+        try {
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            })
 
-        if (error) {
-            alert(`로그인 실패: ${error.message}`)
-        } else {
-            // 로그인 성공 시 메인 페이지로 이동하고 페이지를 새로고침하여 세션 반영
-            router.push('/')
-            router.refresh()
+            if (error) {
+                setErrorMessage(`로그인 실패: ${error.message}`)
+            } else {
+                // 로그인 성공 시 메인 페이지로 이동하고 페이지를 새로고침하여 세션 반영
+                router.push('/')
+                router.refresh()
+            }
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
     }
 
     /**
      * 구글 OAuth 로그인 시작
      */
     const handleGoogleLogin = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                // 인증 완료 후 위에서 만든 callback 라우트로 돌아오기
-                redirectTo: `${window.location.origin}/auth/callback`,
-            },
-        })
+        setLoading(true)
+        setErrorMessage(null)
 
-        if (error) alert(`구글 로그인 에러: ${error.message}`)
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    // 인증 완료 후 위에서 만든 callback 라우트로 돌아오기
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                },
+            })
+
+            if (error) {
+                setErrorMessage(`구글 로그인 에러: ${error.message}`)
+            }
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
         <div className="flex flex-col gap-4 w-full max-w-sm mx-auto p-6 bg-white shadow-md rounded-xl">
             <h1 className="text-2xl font-bold text-center text-gray-800">리스팃 로그인</h1>
+
+            {errorMessage && (
+                <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    {errorMessage}
+                </div>
+            )}
 
             <form onSubmit={handleEmailLogin} className="flex flex-col gap-3">
                 <input
