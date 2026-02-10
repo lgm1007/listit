@@ -10,7 +10,7 @@ import { NextResponse, type NextRequest } from 'next/server'
  * 또한 특정 경로(예: 글쓰기 페이지)에 대한 접근 권한 제어
  */
 export async function middleware(request: NextRequest) {
-    let response = NextResponse.next({
+    const response = NextResponse.next({
         request: {
             headers: request.headers,
         },
@@ -26,10 +26,9 @@ export async function middleware(request: NextRequest) {
                     return request.cookies.getAll()
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-                    response = NextResponse.next({
-                        request,
-                    })
+                    // 요청 객체에 쿠키 추가 (이후 서버 컴포넌트에서 읽을 수 있도록)
+                    cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+                    // 기존 응답 객체에 쿠키 추가
                     cookiesToSet.forEach(({ name, value, options }) =>
                         response.cookies.set(name, value, options)
                     )
