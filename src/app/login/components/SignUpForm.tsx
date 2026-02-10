@@ -1,14 +1,14 @@
 'use client'
 
 import { createClient } from '@/utils/supabase/client'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 /**
  * 사용자가 이메일과 비밀번호를 입력하여 새로운 계정 생성하는 컴포넌트
  */
 export default function SignUpForm() {
     const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const passwordRef = useRef<HTMLInputElement>(null) // useRef로 리렌더링 방지 및 평문 노출 방지
     const [loading, setLoading] = useState(false)
 
     const supabase = createClient()
@@ -20,6 +20,8 @@ export default function SignUpForm() {
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
+
+        const password = passwordRef.current?.value || ''
 
         const { error } = await supabase.auth.signUp({
             email,
@@ -52,10 +54,10 @@ export default function SignUpForm() {
             <input
                 type="password"
                 placeholder="비밀번호 (6자 이상)"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                ref={passwordRef}
                 className="border p-2 rounded text-black"
                 required
+                autoComplete="new-password" // 기존 비밀번호 자동완성 방지 및 새 비밀번호 저장 제안 받기
             />
             <button
                 type="submit"
