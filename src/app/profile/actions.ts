@@ -9,7 +9,7 @@ type ActionResult = { success: true } | { success: false; error: string }
 // 닉네임 유효성 검사 규칙 - 닉네임 정책
 const USERNAME_MIN_LENGTH = 2
 const USERNAME_MAX_LENGTH = 20
-const USERNAME_PATTERN = /^[a-zA-Z0-9가-힣_]+$/
+const USERNAME_PATTERN = /^[a-zA-Z0-9가-힣_.]+$/
 
 /**
  * 사용자의 닉네임 업데이트 서버 액션
@@ -30,7 +30,7 @@ export async function updateUsername(_prevState: ActionResult | null, formData: 
     }
 
     if (!USERNAME_PATTERN.test(username)) {
-        return { success: false, error: '닉네임은 한글, 영문, 숫자, 밑줄(_)만 사용할 수 있습니다.' }
+        return { success: false, error: '닉네임은 한글, 영문, 숫자, 언더바(_), 온점(.)만 사용할 수 있습니다.' }
     }
 
     // 2. 인증 확인
