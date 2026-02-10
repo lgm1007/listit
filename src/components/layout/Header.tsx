@@ -65,7 +65,7 @@ export default function Header({ userProfile }: HeaderProps) {
                             </Link>
                             <div className="flex items-center gap-3 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
                                 <span className="text-sm font-semibold text-gray-700">
-                                    {userProfile.username}님
+                                    {userProfile.username || '사용자'}님
                                 </span>
                                 <button
                                     onClick={handleLogout}
