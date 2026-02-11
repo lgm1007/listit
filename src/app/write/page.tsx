@@ -24,7 +24,6 @@ export default function WritePage() {
     // 1. 메인 리스트 상태
     const [title, setTitle] = useState('')
     const [category, setCategory] = useState('기타')
-    const [description, setDescription] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     // 2. 하위 리스트 아이템 상태 (기본 1개 포함)
