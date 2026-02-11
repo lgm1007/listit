@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { uploadImage } from '@/utils/supabase/storage'
 import { saveList } from './action'
+import { compressImage } from '@/utils/imageControl'
 
 interface ListItemInput {
     title: string
@@ -87,12 +88,12 @@ export default function WritePage() {
                 items.map(async (item, index) => {
                     let imageUrl = null
 
-                    console.log(`아이템 ${index} 이미지 객체:`, item.image)
-
                     if (item.image) {
                         try {
-                            imageUrl = await uploadImage(item.image, user.id)
-                            console.log(`이미지 성공 URL: `, imageUrl)
+                            // 이미지 업로드 전 이미지 압축 진행
+                            const compressed = await compressImage(item.image)
+                            // 압축된 이미지를 업로드 함수로 전달
+                            imageUrl = await uploadImage(compressed as File, user.id)
                         } catch (error: any) {
                             console.error(`이미지 업로드 실패:`, error.message)
                         }
