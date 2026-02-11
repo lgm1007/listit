@@ -26,7 +26,6 @@ export default function SignUpForm() {
      */
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault()
-        setLoading(true)
         setErrorMessage(null)
 
         const password = passwordRef.current?.value || ''
@@ -35,29 +34,27 @@ export default function SignUpForm() {
         // 비밀번호 정책 검증
         if (password.length < PASSWORD_MIN_LENGTH) {
             setErrorMessage(`비밀번호는 ${PASSWORD_MIN_LENGTH}자 이상이어야 합니다.`)
-            setLoading(false)
             return
         }
 
         if (!HAS_LETTER.test(password)) {
             setErrorMessage('비밀번호에 영문자가 최소 1자 포함되어야 합니다.')
-            setLoading(false)
             return
         }
 
         if (!HAS_NUMBER.test(password)) {
             setErrorMessage('비밀번호에 숫자가 최소 1자 포함되어야 합니다.')
-            setLoading(false)
             return
         }
 
         // 비밀번호 일치 여부 확인
         if (password !== confirmPassword) {
             setErrorMessage('비밀번호가 일치하지 않습니다.')
-            setLoading(false)
             return
         }
 
+        // 유효성 검사 통과 후 로딩 시작
+        setLoading(true)
         try {
             const { error } = await supabase.auth.signUp({
                 email,
@@ -74,6 +71,7 @@ export default function SignUpForm() {
                 alert('회원가입 확인 메일을 보냈습니다. 이메일 함을 확인해주세요')
             }
         } finally {
+            // 로딩 종료
             setLoading(false)
         }
     }
