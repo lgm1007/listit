@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { uploadImage } from '@/utils/supabase/storage'
@@ -55,7 +55,12 @@ export default function WritePage() {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // 2. 파일 객체를 상태에 저장
+        // 2. 이전 미리보기 URL이 있으면 메모리에서 해제
+        if (items[index].previewUrl) {
+            URL.revokeObjectURL(items[index].previewUrl)
+        }
+
+        // 3. 새 미리보기 URL 생성
         const url = URL.createObjectURL(file);
 
         // 3. 기존 updateItem 함수를 사용해 image와 previewUrl을 동시에 업데이트
@@ -67,6 +72,20 @@ export default function WritePage() {
         }
         setItems(newItems)
     }
+
+    /**
+     * 컴포넌트 언마운트 시 남아있는 모든 미리보기 URL 해제
+     */
+    useEffect(() => {
+        return () => {
+            items.forEach((item) => {
+                if (item.previewUrl) {
+                    URL.revokeObjectURL(item.previewUrl)
+                }
+            })
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     /**
      * 전체 데이터를 저장하는 핵심 핸들러
