@@ -111,7 +111,7 @@ export default function WritePage() {
                         required
                     />
                     <div className="flex gap-2">
-                        {['여행', '데이트', '맛집', '영화', '드라마', '애니메이션', '책', '전시·공연', '게임', '패션', '뷰티', '운동', '기타'].map((cat) => (
+                        {['여행', '데이트', '맛집', '문화·컨텐츠', '취미', '패션·뷰티', '기타'].map((cat) => (
                             <button
                                 key={cat}
                                 type="button"
