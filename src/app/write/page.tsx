@@ -50,10 +50,22 @@ export default function WritePage() {
     /**
      * 이미지 선택 시 미리보기 URL 생성
      */
-    const handleImageChange = (index: number, file: File) => {
-        const url = URL.createObjectURL(file)
-        updateItem(index, 'image', file)
-        updateItem(index, 'previewUrl', url)
+    const handleImageChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+        // 1. 파일 선택되었는지 확인
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // 2. 파일 객체를 상태에 저장
+        const url = URL.createObjectURL(file);
+
+        // 3. 기존 updateItem 함수를 사용해 image와 previewUrl을 동시에 업데이트
+        const newItems = [...items]
+        newItems[index] = {
+            ...newItems[index],
+            image: file,
+            previewUrl: url
+        }
+        setItems(newItems)
     }
 
     /**
@@ -74,8 +86,16 @@ export default function WritePage() {
             const itemDataWithUrls = await Promise.all(
                 items.map(async (item, index) => {
                     let imageUrl = null
+
+                    console.log(`아이템 ${index} 이미지 객체:`, item.image)
+
                     if (item.image) {
-                        imageUrl = await uploadImage(item.image, user.id)
+                        try {
+                            imageUrl = await uploadImage(item.image, user.id)
+                            console.log(`이미지 성공 URL: `, imageUrl)
+                        } catch (error: any) {
+                            console.error(`이미지 업로드 실패:`, error.message)
+                        }
                     }
                     return {
                         title: item.title,
@@ -147,7 +167,8 @@ export default function WritePage() {
                                                 type="file"
                                                 accept="image/*"
                                                 className="hidden"
-                                                onChange={(e) => e.target.files?.[0] && handleImageChange(index, e.target.files[0])}
+                                                id={`file-${index}`}
+                                                onChange={(e) => handleImageChange(index, e)}
                                             />
                                         </label>
                                     )}
