@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
+import { uploadImage } from '@/utils/supabase/storage'
+import { saveList } from './action'
 
 interface ListItemInput {
     title: string
@@ -22,6 +24,7 @@ export default function WritePage() {
     const [title, setTitle] = useState('')
     const [category, setCategory] = useState('기타')
     const [description, setDescription] = useState('')
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     // 2. 하위 리스트 아이템 상태 (기본 1개 포함)
     const [items, setItems] = useState<ListItemInput[]>([
@@ -58,8 +61,40 @@ export default function WritePage() {
      */
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        // TODO: 구현할 저장 로직이 들어갈 자리
-        console.log({ title, category, items })
+        if (isSubmitting) return
+
+        setIsSubmitting(true)
+
+        try {
+            const supabase = createClient()
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return alert('로그인이 필요합니다.')
+
+            // 1. 이미지 업로드 병렬 처리
+            const itemDataWithUrls = await Promise.all(
+                items.map(async (item, index) => {
+                    let imageUrl = null
+                    if (item.image) {
+                        imageUrl = await uploadImage(item.image, user.id)
+                    }
+                    return {
+                        title: item.title,
+                        content: item.content,
+                        image_url: imageUrl,
+                        order_no: index
+                    }
+                })
+            )
+
+            // 2. 서버 액션 호출하여 DB 저장
+            await saveList(title, category, itemDataWithUrls)
+
+        } catch (error: any) {
+            console.error('Error saving list:', error)
+            alert('리스트 저장 중 오류가 발생했습니다.')
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     return (
@@ -149,9 +184,10 @@ export default function WritePage() {
                     </button>
                     <button
                         type="submit"
+                        disabled={isSubmitting}
                         className="w-full py-4 bg-black text-white rounded-xl font-bold text-lg hover:bg-gray-800 transition"
                     >
-                        리스트 등록하기
+                        {isSubmitting ? '저장 중...' : '리스트 등록하기'}
                     </button>
                 </div>
             </form>
