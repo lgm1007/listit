@@ -7,7 +7,7 @@ import { createClient } from '@/utils/supabase/client'
 export const uploadImage = async (file: File, userId: string) => {
     const supabase = createClient()
     const fileExt = file.name.split('.').pop()
-    const fileName = `${Math.random()}.${fileExt}`
+    const fileName = `${crypto.randomUUID()}.${fileExt}`
     const filePath = `${userId}/${Date.now()}_${fileName}`
 
     // 이미지 업로드하기
