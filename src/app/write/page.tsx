@@ -186,7 +186,7 @@ export default function WritePage() {
                                 <textarea
                                     placeholder="설명을 입력하세요 (선택 사항)"
                                     className="w-full border-none focus:ring-0 resize-none text-gray-600"
-                                    rows={2}
+                                    rows={4}
                                     value={item.content}
                                     onChange={(e) => updateItem(index, 'content', e.target.value)}
                                 />
