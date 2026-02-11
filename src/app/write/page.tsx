@@ -88,6 +88,28 @@ export default function WritePage() {
     }, [])
 
     /**
+     * 특정 순번의 리스트 아이템을 삭제합니다.
+     */
+    const removeItem = (index: number) => {
+        // 최소 1개는 유지되도록 설정
+        if (items.length <= 1) {
+            alert('최소 한 개의 항목은 있어야 합니다.')
+            return
+        }
+        const newItems = items.filter((_, i) => i !== index)
+        setItems(newItems)
+    }
+
+    /**
+     * 기존 이미지를 제거하고 초기 상태로 되돌립니다 (이미지 변경 기능의 핵심).
+     */
+    const removeImage = (index: number) => {
+        const newItems = [...items]
+        newItems[index] = { ...newItems[index], image: null, previewUrl: '' }
+        setItems(newItems)
+    }
+
+    /**
      * 전체 데이터를 저장하는 핵심 핸들러
      */
     const handleSubmit = async (e: React.FormEvent) => {
@@ -169,28 +191,68 @@ export default function WritePage() {
                 {/* 아이템 리스트 섹션 */}
                 <section className="space-y-12">
                     {items.map((item, index) => (
-                        <div key={index} className="flex gap-6 group">
+                        <div key={index} className="flex gap-6 relative group border-b border-gray-50 pb-12 last:border-0">
+                            {/* 1. 항목 삭제 버튼 (항목이 2개 이상일 때만 표시) */}
+                            {items.length > 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() => removeItem(index)}
+                                    className="absolute -right-2 -top-2 w-7 h-7 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors shadow-sm z-20"
+                                    title="항목 삭제"
+                                >
+                                    <span className="text-lg leading-none">×</span>
+                                </button>
+                            )}
+
+                            {/* 번호 표시 */}
                             <div className="flex-none w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-400">
                                 {index + 1}
                             </div>
 
                             <div className="flex-grow space-y-4">
-                                {/* 이미지 업로드 영역 */}
-                                <div className="relative w-full aspect-video bg-gray-50 rounded-xl overflow-hidden border-2 border-dashed border-gray-200 hover:border-gray-400 transition">
+                                {/* 2. 이미지 업로드/변경 영역 */}
+                                <div className="relative w-full aspect-video bg-gray-50 rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 transition-all">
                                     {item.previewUrl ? (
-                                        <img src={item.previewUrl} className="w-full h-full object-cover" alt="미리보기" />
+                                        <div className="relative w-full h-full group">
+                                            <img src={item.previewUrl} className="w-full h-full object-cover" alt="미리보기" />
+
+                                            {/* 이미지 컨트롤 버튼: 항상 보이거나 마우스 오버 시 더 선명하게 */}
+                                            <div className="absolute bottom-4 right-4 flex gap-2">
+                                                <label
+                                                    htmlFor={`file-${index}`}
+                                                    className="px-3 py-2 bg-white/90 backdrop-blur shadow-sm rounded-lg text-xs font-bold cursor-pointer hover:bg-white transition"
+                                                >
+                                                    이미지 변경
+                                                </label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(index)}
+                                                    className="px-3 py-2 bg-red-500/90 backdrop-blur shadow-sm text-white rounded-lg text-xs font-bold hover:bg-red-600 transition"
+                                                >
+                                                    삭제
+                                                </button>
+                                            </div>
+                                        </div>
                                     ) : (
-                                        <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer">
-                                            <span className="text-gray-400 text-sm">이미지 추가</span>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                className="hidden"
-                                                id={`file-${index}`}
-                                                onChange={(e) => handleImageChange(index, e)}
-                                            />
+                                        <label
+                                            htmlFor={`file-${index}`}
+                                            className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition"
+                                        >
+                                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mb-2">
+                                                <span className="text-gray-500 text-xl">+</span>
+                                            </div>
+                                            <span className="text-gray-400 text-sm font-medium">이미지 추가</span>
                                         </label>
                                     )}
+
+                                    {/* 파일 인풋은 항상 연결 상태 유지 */}
+                                    <input
+                                        type="file"
+                                        id={`file-${index}`}
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => handleImageChange(index, e)}
+                                    />
                                 </div>
 
                                 <input
