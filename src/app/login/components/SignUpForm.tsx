@@ -12,6 +12,7 @@ export default function SignUpForm() {
     const confirmPasswordRef = useRef<HTMLInputElement>(null)
     const [loading, setLoading] = useState(false)   // 비동기 작업이 진행 중인지 여부 boolean 상태값
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
     const supabase = createClient()
 
@@ -68,7 +69,7 @@ export default function SignUpForm() {
             if (error) {
                 setErrorMessage(`회원가입 에러: ${error.message}`)
             } else {
-                alert('회원가입 확인 메일을 보냈습니다. 이메일 함을 확인해주세요')
+                setSuccessMessage('회원가입 확인 메일을 보냈습니다. 이메일 함을 확인해주세요')
             }
         } finally {
             // 로딩 종료
@@ -83,6 +84,12 @@ export default function SignUpForm() {
             {errorMessage && (
                 <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg text-sm">
                     {errorMessage}
+                </div>
+            )}
+
+            {successMessage && (
+                <div className="bg-green-50 border border-green-300 text-green-700 px-4 py-3 rounded-lg text-sm">
+                    {successMessage}
                 </div>
             )}
 
