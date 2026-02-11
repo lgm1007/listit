@@ -93,7 +93,7 @@ export default function WritePage() {
                             // 이미지 업로드 전 이미지 압축 진행
                             const compressed = await compressImage(item.image)
                             // 압축된 이미지를 업로드 함수로 전달
-                            imageUrl = await uploadImage(compressed as File, user.id)
+                            imageUrl = await uploadImage(compressed, user.id)
                         } catch (error: any) {
                             console.error(`이미지 업로드 실패:`, error.message)
                         }
