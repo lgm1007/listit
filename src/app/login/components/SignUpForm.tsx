@@ -10,10 +10,15 @@ export default function SignUpForm() {
     const [email, setEmail] = useState('')
     const passwordRef = useRef<HTMLInputElement>(null) // useRef로 리렌더링 방지 및 평문 노출 방지
     const confirmPasswordRef = useRef<HTMLInputElement>(null)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)   // 비동기 작업이 진행 중인지 여부 boolean 상태값
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
     const supabase = createClient()
+
+    // 비밀번호 정책: 영문자 + 숫자 조합 필수, 특수기호 선택
+    const PASSWORD_MIN_LENGTH = 8
+    const HAS_LETTER = /[a-zA-Z]/       // 영문자(대소문자 구분 없이) 최소 1자
+    const HAS_NUMBER = /[0-9]/          // 숫자 최소 1자
 
     /**
      * Supabase Auth를 통해 회원가입 요청
@@ -26,6 +31,25 @@ export default function SignUpForm() {
 
         const password = passwordRef.current?.value || ''
         const confirmPassword = confirmPasswordRef.current?.value || ''
+
+        // 비밀번호 정책 검증
+        if (password.length < PASSWORD_MIN_LENGTH) {
+            setErrorMessage(`비밀번호는 ${PASSWORD_MIN_LENGTH}자 이상이어야 합니다.`)
+            setLoading(false)
+            return
+        }
+
+        if (!HAS_LETTER.test(password)) {
+            setErrorMessage('비밀번호에 영문자가 최소 1자 포함되어야 합니다.')
+            setLoading(false)
+            return
+        }
+
+        if (!HAS_NUMBER.test(password)) {
+            setErrorMessage('비밀번호에 숫자가 최소 1자 포함되어야 합니다.')
+            setLoading(false)
+            return
+        }
 
         // 비밀번호 일치 여부 확인
         if (password !== confirmPassword) {
@@ -47,7 +71,7 @@ export default function SignUpForm() {
             if (error) {
                 setErrorMessage(`회원가입 에러: ${error.message}`)
             } else {
-                alert('회원가입 확인 메일을 보냈습니다. 이메일 함을 확인해주세요!')
+                alert('회원가입 확인 메일을 보냈습니다. 이메일 함을 확인해주세요')
             }
         } finally {
             setLoading(false)
@@ -74,7 +98,7 @@ export default function SignUpForm() {
             />
             <input
                 type="password"
-                placeholder="비밀번호 (6자 이상)"
+                placeholder="비밀번호 (영문 + 숫자 조합, 8자 이상)"
                 ref={passwordRef}
                 className="border p-2 rounded text-black"
                 required
@@ -90,7 +114,7 @@ export default function SignUpForm() {
             />
             <button
                 type="submit"
-                disabled={loading}
+                disabled={loading}  // 비동기 응답을 기다리는 동안 버튼 비활성화
                 className="bg-green-600 text-white p-2 rounded hover:bg-green-700 disabled:bg-gray-400"
             >
                 {loading ? '처리 중...' : '회원가입'}
