@@ -24,27 +24,16 @@ export async function saveList(
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('로그인이 필요합니다.')
 
-    // 2. lists 테이블에 메인 정보 저장
-    const { data: listData, error: listError } = await supabase
-        .from('lists')
-        .insert([{ title, category, user_id: user.id }])
-        .select()
-        .single()
+    // 2. Supabase에서 정의한 PostgreSQL RPC 함수를 통해 lists + list_items를 단일 트랜잭션으로 저장
+    const { data, error } = await supabase.rpc('create_list_with_items', {
+        p_title: title,
+        p_category: category,
+        p_user_id: user.id,
+        p_items: items,
+    })
 
-    if (listError) throw listError
+    if (error) throw error
 
-    // 3. list_items 테이블에 하위 아이템들 벌크 저장 (Bulk Insert)
-    const itemsWithListId = items.map(item => ({
-        ...item,
-        list_id: listData.id
-    }))
-
-    const { error: itemsError } = await supabase
-        .from('list_items')
-        .insert(itemsWithListId)
-
-    if (itemsError) throw itemsError
-
-    // 4. 성공 시 메인 페이지 이동
+    // 3. 성공 시 메인 페이지 이동
     redirect('/')
 }
