@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import Image from 'next/image'
 import Link from 'next/link'
+import SearchInput from '../components/home/SearchInput'
 
 /**
  * 메인 페이지: 리스트 검색, 카테고리 필터링, 그리드 피드 제공
@@ -8,11 +9,13 @@ import Link from 'next/link'
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { query?: string; category?: string }
+  searchParams: Promise<{ query?: string; category?: string }>
 }) {
+  const { query: searchQuery, category: selectedCategory } = await searchParams
   const supabase = await createClient()
-  const query = searchParams.query || ''
-  const category = searchParams.category || '전체'
+
+  const query = searchQuery || ''
+  const category = selectedCategory || '전체'
 
   // 1. Supabase 쿼리 빌드
   let dbQuery = supabase
@@ -21,7 +24,6 @@ export default async function Home({
       id,
       title,
       category,
-      user_id,
       profiles (username),
       list_items (image_url, order_no)
     `)
@@ -43,29 +45,30 @@ export default async function Home({
 
   return (
     <main className="max-w-[1600px] mx-auto px-6 py-8">
-      {/* 검색 및 필터 섹션 */}
+      {/* 검색 섹션: 별도 클라이언트 컴포넌트로 분리 */}
       <section className="mb-10 space-y-6">
-        <form action="/" method="GET" className="max-w-2xl mx-auto">
-          <input
-            type="text"
-            name="query"
-            placeholder="어떤 리스트를 찾으시나요?"
-            defaultValue={query}
-            className="w-full px-6 py-4 bg-gray-100 border-none rounded-2xl focus:ring-2 focus:ring-black transition"
-          />
-        </form>
+        <div className="max-w-2xl mx-auto">
+          <SearchInput defaultValue={query} />
+        </div>
 
+        {/* 카테고리 필터링 버튼 */}
         <div className="flex flex-wrap justify-center gap-3">
-          {categories.map((cat) => (
+          {categories.map((c) => (
             <Link
-              key={cat}
-              href={`/?category=${cat}${query ? `&query=${query}` : ''}`}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition ${category === cat
+              key={c}
+              href={{
+                pathname: '/',
+                query: {
+                  category: c,
+                  ...(query ? { query } : {}) // 검색어 유지
+                }
+              }}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition ${category === c
                 ? 'bg-black text-white'
                 : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-400'
                 }`}
             >
-              {cat}
+              {c}
             </Link>
           ))}
         </div>
