@@ -22,7 +22,7 @@ export default async function ListDetailPage({ params }: { params: { id: string 
     if (error || !list) return notFound()
 
     // 2. 아이템 정렬 (order_no 순)
-    const sortedItems = list.list_items.sort((a: any, b: any) => a.order_no - b.order_no)
+    const sortedItems = [...list.list_items].sort((a, b) => a.order_no - b.order_no)
 
     return (
         <main className="max-w-3xl mx-auto px-6 py-12">
