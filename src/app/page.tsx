@@ -1,65 +1,126 @@
-import Image from "next/image";
+import { createClient } from '@/utils/supabase/server'
+import Image from 'next/image'
+import Link from 'next/link'
+import SearchInput from '../components/home/SearchInput'
 
-export default function Home() {
+/**
+ * 메인 페이지: 리스트 검색, 카테고리 필터링, 그리드 피드 제공
+ */
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ query?: string; category?: string }>
+}) {
+  const { query: searchQuery, category: selectedCategory } = await searchParams
+  const supabase = await createClient()
+
+  const query = searchQuery || ''
+  const category = selectedCategory || '전체'
+
+  // 1. Supabase 쿼리 빌드
+  let dbQuery = supabase
+    .from('lists')
+    .select(`
+      id,
+      title,
+      category,
+      profiles (username),
+      list_items (image_url, order_no)
+    `)
+    .order('created_at', { ascending: false })
+
+  // 2. 검색어 필터링 (TODO: 나중에 OpenSearch로 확장 가능)
+  if (query) {
+    dbQuery = dbQuery.ilike('title', `%${query}%`)
+  }
+
+  // 3. 카테고리 필터링
+  if (category !== '전체') {
+    dbQuery = dbQuery.eq('category', category)
+  }
+
+  const { data: lists, error } = await dbQuery
+
+  const categories = ['전체', '여행', '데이트', '맛집', '문화·컨텐츠', '취미', '패션·뷰티', '기타']
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="max-w-[1600px] mx-auto px-6 py-8">
+      {/* 검색 섹션: 별도 클라이언트 컴포넌트로 분리 */}
+      <section className="mb-10 space-y-6">
+        <div className="max-w-2xl mx-auto">
+          <SearchInput defaultValue={query} />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* 카테고리 필터링 버튼 */}
+        <div className="flex flex-wrap justify-center gap-3">
+          {categories.map((c) => (
+            <Link
+              key={c}
+              href={{
+                pathname: '/',
+                query: {
+                  category: c,
+                  ...(query ? { query } : {}) // 검색어 유지
+                }
+              }}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition ${category === c
+                ? 'bg-black text-white'
+                : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-400'
+                }`}
+            >
+              {c}
+            </Link>
+          ))}
         </div>
-      </main>
-    </div>
-  );
+      </section>
+
+      {/* 리스트 그리드 피드 */}
+      <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+        {lists?.map((list) => {
+          // profiles가 배열로 들어올 경우를 대비해 첫 번째 요소 가져오기, 객체라면 그대로 객체 사용
+          const profileData = Array.isArray(list.profiles) ? list.profiles[0] : list.profiles;
+
+          // 카테고리 별 기본 이미지 매핑용 객체
+          const categoryPlaceholders: Record<string, string> = {
+            '여행': '/placeholder_travel.png',
+            '데이트': '/placeholder_date.png',
+            '맛집': '/placeholder_food.png',
+            '문화·컨텐츠': '/placeholder_content.png',
+            '취미': '/placeholder_hobby.png',
+            '패션·뷰티': '/placeholder_beauty.png',
+            '기타': '/placeholder_guitar.png'
+          };
+
+          // order_no가 0인 이미지 찾기
+          const representativeItem = list.list_items.find(item => item.order_no === 0)
+          const thumbnail = representativeItem?.image_url || categoryPlaceholders[list.category || '기타']
+
+          return (
+            <Link key={list.id} href={`/list/${list.id}`} className="group cursor-pointer">
+              <div className="relative aspect-square overflow-hidden rounded-2xl bg-gray-100 mb-3">
+                <Image
+                  src={thumbnail}
+                  alt={list.title}
+                  fill
+                  className="object-cover group-hover:scale-105 transition duration-300"
+                />
+              </div>
+              <h3 className="font-bold text-gray-900 line-clamp-2 leading-tight group-hover:underline">
+                {list.title}
+              </h3>
+              <p className="text-xs text-gray-400 mt-1">
+                by {profileData?.username || '익명'}
+              </p>
+            </Link>
+          )
+        })}
+      </section>
+
+      {lists?.length === 0 && (
+        <div className="text-center py-20 text-gray-400">
+          찾으시는 리스트가 아직 없어요! 😅
+        </div>
+      )}
+    </main>
+  )
 }
