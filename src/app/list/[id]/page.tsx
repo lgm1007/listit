@@ -46,7 +46,7 @@ export default async function ListDetailPage({ params }: { params: { id: string 
 
             {/* 리스트 아이템 섹션 */}
             <section className="space-y-16 mb-20">
-                {sortedItems.map((item: any, index: number) => (
+                {sortedItems.map((item, index: number) => (
                     <div key={item.id} className="group">
                         <div className="flex items-center gap-4 mb-6">
                             <span className="flex-none w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-black text-lg">
