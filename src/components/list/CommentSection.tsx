@@ -66,6 +66,7 @@ export default function CommentSection({ listId }: { listId: string }) {
             .from('comments')
             .update({ content: editContent })
             .eq('id', commentId)
+            .eq('user_id', currentUserId)
 
         if (error) {
             alert('수정 실패: ' + error.message)
