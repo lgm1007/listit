@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/utils/supabase/client'
 
 export default function CommentSection({ listId }: { listId: string }) {
@@ -19,7 +20,7 @@ export default function CommentSection({ listId }: { listId: string }) {
 
         const { data } = await supabase
             .from('comments')
-            .select('*, profiles(username)')
+            .select('*, profiles(username, avatar_url)')
             .eq('list_id', listId)
             .order('created_at', { ascending: true })
         if (data) setComments(data)
@@ -96,7 +97,24 @@ export default function CommentSection({ listId }: { listId: string }) {
             <div className="space-y-8">
                 {comments.map(comment => (
                     <div key={comment.id} className="flex gap-4 group">
-                        <div className="w-10 h-10 bg-gray-100 rounded-full flex-none overflow-hidden relative" />
+                        <div className="w-10 h-10 bg-gray-100 rounded-full flex-none overflow-hidden relative border border-gray-50">
+                            {comment.profiles?.avatar_url ? (
+                                <Image
+                                    src={comment.profiles.avatar_url}
+                                    alt={`${comment.profiles.username}의 아바타`}
+                                    fill
+                                    className="object-cover"
+                                    sizes="40px"
+                                />
+                            ) : (
+                                // 이미지가 없을 때 보여줄 기본 UI
+                                <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
+                                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                    </svg>
+                                </div>
+                            )}
+                        </div>
 
                         <div className="flex-grow">
                             <div className="flex justify-between items-center mb-1">
