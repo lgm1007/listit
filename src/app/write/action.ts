@@ -34,6 +34,6 @@ export async function saveList(
 
     if (error) throw error
 
-    // 3. 성공 시 메인 페이지 이동
-    redirect('/')
+    // 3. 성공 시 성공 결과 반환
+    return { success: true }
 }
