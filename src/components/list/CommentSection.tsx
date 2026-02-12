@@ -7,26 +7,35 @@ export default function CommentSection({ listId }: { listId: string }) {
     const supabase = createClient()
     const [comments, setComments] = useState<any[]>([])
     const [newComment, setNewComment] = useState('')
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+
+    // 수정 모드 상태
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [editContent, setEditContent] = useState('')
 
     const fetchComments = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        setCurrentUserId(user?.id || null)
+
         const { data } = await supabase
             .from('comments')
             .select('*, profiles(username)')
             .eq('list_id', listId)
-            .order('created_at', { descending: true })
+            .order('created_at', { ascending: true })
         if (data) setComments(data)
     }
 
     useEffect(() => { fetchComments() }, [listId])
 
+    // 댓글 등록
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return alert('로그인이 필요합니다.')
+        if (!currentUserId) return alert('로그인이 필요합니다.')
+        if (!newComment.trim()) return
 
         const { error } = await supabase.from('comments').insert({
             list_id: listId,
-            user_id: user.id,
+            user_id: currentUserId,
             content: newComment
         })
 
@@ -36,31 +45,97 @@ export default function CommentSection({ listId }: { listId: string }) {
         }
     }
 
+    // 댓글 삭제
+    const handleDelete = async (commentId: string) => {
+        if (!confirm('정말 삭제하시겠습니까?')) return
+
+        const { error } = await supabase.from('comments').delete().eq('id', commentId)
+        if (error) alert('삭제 실패: ' + error.message)
+        else fetchComments()
+    }
+
+    // 댓글 수정 저장
+    const handleUpdate = async (commentId: string) => {
+        if (!editContent.trim()) return
+
+        const { error } = await supabase
+            .from('comments')
+            .update({ content: editContent })
+            .eq('id', commentId)
+
+        if (error) {
+            alert('수정 실패: ' + error.message)
+        } else {
+            setEditingId(null)
+            fetchComments()
+        }
+    }
+
     return (
         <div className="space-y-8">
             <h3 className="text-xl font-bold italic">Comments ({comments.length})</h3>
 
+            {/* 등록 폼 */}
             <form onSubmit={handleSubmit} className="flex gap-4">
                 <input
                     type="text"
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="리스트에 대한 코멘트를 남겨보세요!"
-                    className="flex-grow p-4 bg-gray-50 rounded-xl focus:ring-2 focus:ring-black outline-none border-none"
+                    placeholder="리스트에 대한 생각을 남겨보세요!"
+                    className="flex-grow p-4 bg-gray-50 rounded-xl focus:ring-2 focus:ring-black outline-none border-none transition"
                 />
                 <button className="px-6 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition cursor-pointer">등록</button>
             </form>
 
-            <div className="space-y-6">
+            {/* 댓글 목록 */}
+            <div className="space-y-8">
                 {comments.map(comment => (
-                    <div key={comment.id} className="flex gap-4">
-                        <div className="w-10 h-10 bg-gray-100 rounded-full flex-none" />
-                        <div>
-                            <div className="flex gap-2 items-center mb-1">
-                                <span className="font-bold text-sm">{comment.profiles?.username}</span>
-                                <span className="text-[10px] text-gray-400">{new Date(comment.created_at).toLocaleDateString()}</span>
+                    <div key={comment.id} className="flex gap-4 group">
+                        <div className="w-10 h-10 bg-gray-100 rounded-full flex-none overflow-hidden relative" />
+
+                        <div className="flex-grow">
+                            <div className="flex justify-between items-center mb-1">
+                                <div className="flex gap-2 items-center">
+                                    <span className="font-bold text-sm">{comment.profiles?.username}</span>
+                                    <span className="text-[10px] text-gray-400">
+                                        {new Date(comment.created_at).toLocaleDateString()}
+                                    </span>
+                                </div>
+
+                                {/* 본인 댓글일 때 & 수정 중이 아닐 때만 수정/삭제 버튼 노출 */}
+                                {currentUserId === comment.user_id && editingId !== comment.id && (
+                                    <div className="flex gap-3 text-xs text-gray-400">
+                                        <button
+                                            onClick={() => { setEditingId(comment.id); setEditContent(comment.content); }}
+                                            className="hover:text-black transition cursor-pointer"
+                                        >수정</button>
+                                        <button
+                                            onClick={() => handleDelete(comment.id)}
+                                            className="hover:text-red-500 transition cursor-pointer"
+                                        >삭제</button>
+                                    </div>
+                                )}
                             </div>
-                            <p className="text-gray-600 text-sm leading-relaxed">{comment.content}</p>
+
+                            {/* 수정 중 여부에 따른 댓글 수정 폼 렌더링 */}
+                            {editingId === comment.id ? (
+                                <div className="mt-2 space-y-2">
+                                    <textarea
+                                        value={editContent}
+                                        onChange={(e) => setEditContent(e.target.value)}
+                                        className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-1 focus:ring-black"
+                                        rows={3}
+                                    />
+                                    <div className="flex gap-2 justify-end">
+                                        <button onClick={() => setEditingId(null)} className="px-3 py-1 text-xs text-gray-500 cursor-pointer">취소</button>
+                                        <button onClick={() => handleUpdate(comment.id)} className="px-3 py-1 text-xs bg-black text-white rounded-md cursor-pointer">저장</button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">
+                                    {comment.content}
+                                </p>
+                            )}
                         </div>
                     </div>
                 ))}
