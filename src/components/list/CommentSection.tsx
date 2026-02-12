@@ -49,7 +49,11 @@ export default function CommentSection({ listId }: { listId: string }) {
     const handleDelete = async (commentId: string) => {
         if (!confirm('정말 삭제하시겠습니까?')) return
 
-        const { error } = await supabase.from('comments').delete().eq('id', commentId)
+        const { error } = await supabase
+            .from('comments')
+            .delete()
+            .eq('id', commentId)
+            .eq('user_id', currentUserId)
         if (error) alert('삭제 실패: ' + error.message)
         else fetchComments()
     }
