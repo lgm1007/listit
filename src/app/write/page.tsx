@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/client'
 import { uploadImage } from '@/utils/supabase/storage'
 import { saveList } from './action'
 import { compressImage } from '@/utils/imageControl'
+import { CATEGORY_NAMES } from '../../constants/categories'
 
 interface ListItemInput {
     title: string
@@ -172,7 +173,7 @@ export default function WritePage() {
                         required
                     />
                     <div className="flex gap-2">
-                        {['여행', '데이트', '맛집', '문화·컨텐츠', '취미', '패션·뷰티', '기타'].map((cat) => (
+                        {CATEGORY_NAMES.filter(name => name !== '전체').map((cat) => (
                             <button
                                 key={cat}
                                 type="button"

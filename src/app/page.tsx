@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import Image from 'next/image'
 import Link from 'next/link'
 import SearchInput from '../components/home/SearchInput'
+import { CATEGORY_NAMES, CATEGORY_IMAGE } from '../constants/categories'
 
 /**
  * 메인 페이지: 리스트 검색, 카테고리 필터링, 그리드 피드 제공
@@ -41,8 +42,6 @@ export default async function Home({
 
   const { data: lists, error } = await dbQuery
 
-  const categories = ['전체', '여행', '데이트', '맛집', '문화·컨텐츠', '취미', '패션·뷰티', '기타']
-
   return (
     <main className="max-w-[1600px] mx-auto px-6 py-8">
       {/* 검색 섹션: 별도 클라이언트 컴포넌트로 분리 */}
@@ -53,22 +52,22 @@ export default async function Home({
 
         {/* 카테고리 필터링 버튼 */}
         <div className="flex flex-wrap justify-center gap-3">
-          {categories.map((c) => (
+          {CATEGORY_NAMES.map((cat) => (
             <Link
-              key={c}
+              key={cat}
               href={{
                 pathname: '/',
                 query: {
-                  category: c,
+                  category: cat,
                   ...(query ? { query } : {}) // 검색어 유지
                 }
               }}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition ${category === c
+              className={`px-5 py-2 rounded-full text-sm font-medium transition ${category === cat
                 ? 'bg-black text-white'
                 : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-400'
                 }`}
             >
-              {c}
+              {cat}
             </Link>
           ))}
         </div>
@@ -80,20 +79,9 @@ export default async function Home({
           // profiles가 배열로 들어올 경우를 대비해 첫 번째 요소 가져오기, 객체라면 그대로 객체 사용
           const profileData = Array.isArray(list.profiles) ? list.profiles[0] : list.profiles;
 
-          // 카테고리 별 기본 이미지 매핑용 객체
-          const categoryPlaceholders: Record<string, string> = {
-            '여행': '/placeholder_travel.png',
-            '데이트': '/placeholder_date.png',
-            '맛집': '/placeholder_food.png',
-            '문화·컨텐츠': '/placeholder_content.png',
-            '취미': '/placeholder_hobby.png',
-            '패션·뷰티': '/placeholder_beauty.png',
-            '기타': '/placeholder_guitar.png'
-          };
-
           // order_no가 0인 이미지 찾기
           const representativeItem = list.list_items.find(item => item.order_no === 0)
-          const thumbnail = representativeItem?.image_url || categoryPlaceholders[list.category || '기타']
+          const thumbnail = representativeItem?.image_url || CATEGORY_IMAGE[list.category || '기타']
 
           return (
             <Link key={list.id} href={`/list/${list.id}`} className="group cursor-pointer">
