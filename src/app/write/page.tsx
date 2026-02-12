@@ -148,7 +148,12 @@ export default function WritePage() {
             )
 
             // 2. 서버 액션 호출하여 DB 저장
-            await saveList(title, category, itemDataWithUrls)
+            const result = await saveList(title, category, itemDataWithUrls)
+
+            if (result.success) {
+                alert('리스트가 등록되었습니다.')
+                router.push('/')
+            }
 
         } catch (error: any) {
             console.error('Error saving list:', error)
