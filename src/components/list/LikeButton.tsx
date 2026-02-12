@@ -10,15 +10,26 @@ export default function LikeButton({ listId }: { listId: string }) {
 
     useEffect(() => {
         const fetchLikeData = async () => {
-            const { data: { user } } = await supabase.auth.getUser()
-
+            const userPromise = supabase.auth.getUser()
             // 좋아요 개수 확인
-            const { count } = await supabase.from('likes').select('*', { count: 'exact' }).eq('list_id', listId)
+            const countPromise = supabase
+                .from('likes')
+                .select('*', { count: 'exact' })
+                .eq('list_id', listId)
+
+            // 사용자 정보 가져오기 & 좋아요 개수 확인은 서로 의존성이 없으므로 Promise.all로 병렬 실행
+            const [{ data: { user } }, { count }] = await Promise.all([userPromise, countPromise])
+
             setLikeCount(count || 0)
 
-            // 내가 좋아요 했는지 확인
             if (user) {
-                const { data } = await supabase.from('likes').select('*').eq('list_id', listId).eq('user_id', user.id).single()
+                // 내가 좋아요 했는지 확인
+                const { data } = await supabase
+                    .from('likes')
+                    .select('*')
+                    .eq('list_id', listId)
+                    .eq('user_id', user.id)
+                    .single()
                 if (data) setIsLiked(true)
             }
         }
