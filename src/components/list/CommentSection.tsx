@@ -48,7 +48,7 @@ export default function CommentSection({ listId }: { listId: string }) {
                     placeholder="리스트에 대한 코멘트를 남겨보세요!"
                     className="flex-grow p-4 bg-gray-50 rounded-xl focus:ring-2 focus:ring-black outline-none border-none"
                 />
-                <button className="px-6 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition">등록</button>
+                <button className="px-6 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition cursor-pointer">등록</button>
             </form>
 
             <div className="space-y-6">
