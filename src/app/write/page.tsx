@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/client'
 import { uploadImage } from '@/utils/supabase/storage'
 import { saveList } from './action'
 import { compressImage } from '@/utils/imageControl'
+import { handleAuthError } from '@/utils/authErrorHandler'
 import { CATEGORY_NAMES } from '../../constants/categories'
 
 interface ListItemInput {
@@ -121,10 +122,15 @@ export default function WritePage() {
 
         try {
             const supabase = createClient()
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) return alert('로그인이 필요합니다.')
+            const { data: { user }, error: userError } = await supabase.auth.getUser()
 
-            // 1. 이미지 업로드 병렬 처리
+            // 1. 초기 유저 체크 시 에러 핸들링
+            if (userError || !user) {
+                handleAuthError(userError || { status: 401 }, router, '/write')
+                return
+            }
+
+            // 2. 이미지 업로드 병렬 처리
             const itemDataWithUrls = await Promise.all(
                 items.map(async (item, index) => {
                     let imageUrl = null
@@ -148,7 +154,7 @@ export default function WritePage() {
                 })
             )
 
-            // 2. 서버 액션 호출하여 DB 저장
+            // 3. 서버 액션 호출하여 DB 저장
             const result = await saveList(title, category, itemDataWithUrls)
 
             if (result.success) {
@@ -157,8 +163,10 @@ export default function WritePage() {
             }
 
         } catch (error: any) {
-            console.error('Error saving list:', error)
-            alert('리스트 저장 중 오류가 발생했습니다.')
+            if (!handleAuthError(error, router, '/write')) {
+                console.error('Error saving list:', error)
+                alert('리스트 저장 중 오류가 발생했습니다.')
+            }
         } finally {
             setIsSubmitting(false)
         }
