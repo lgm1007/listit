@@ -57,7 +57,7 @@ export default function LikeButton({ listId }: { listId: string }) {
         }
 
         if (result.error) {
-            const handler = handleAuthError(result.error, router)
+            const handler = handleAuthError(result.error, router, `/list/${listId}`)
             if (handler) return // 로그인 페이지로 리다이렉팅 했으므로 종료
 
             alert('좋아요 처리 중 오류가 발생했습니다.')

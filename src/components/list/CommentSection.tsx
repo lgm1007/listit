@@ -57,7 +57,7 @@ export default function CommentSection({ listId }: { listId: string }) {
 
         if (error) {
             // 401 에러 체크 및 리다이렉팅
-            handleAuthError(error, router)
+            handleAuthError(error, router, `/list/${listId}`)
             return
         }
 
@@ -77,7 +77,7 @@ export default function CommentSection({ listId }: { listId: string }) {
 
         if (error) {
             // 401 에러 체크 및 리다이렉팅
-            handleAuthError(error, router)
+            handleAuthError(error, router, `/list/${listId}`)
             return
         }
 
@@ -96,7 +96,7 @@ export default function CommentSection({ listId }: { listId: string }) {
 
         if (error) {
             // 401 에러 체크 및 리다이렉팅
-            handleAuthError(error, router)
+            handleAuthError(error, router, `/list/${listId}`)
             return
         }
 
