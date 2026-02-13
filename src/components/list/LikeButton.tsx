@@ -45,7 +45,7 @@ export default function LikeButton({ listId }: { listId: string }) {
         // 비로그인 시 처리
         if (!user) {
             alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.')
-            router.push(`/login?next=/list/${listId}`)
+            router.push(`/login?next=${encodeURIComponent(`/list/${listId}`)}`)
             return
         }
 
