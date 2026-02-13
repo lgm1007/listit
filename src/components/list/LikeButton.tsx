@@ -2,9 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
+import { useRouter } from 'next/navigation'
+import { handleAuthError } from '@/utils/authErrorHandler'
 
 export default function LikeButton({ listId }: { listId: string }) {
     const supabase = createClient()
+    const router = useRouter()
+
     const [isLiked, setIsLiked] = useState(false)
     const [likeCount, setLikeCount] = useState(0)
 
@@ -38,16 +42,30 @@ export default function LikeButton({ listId }: { listId: string }) {
 
     const toggleLike = async () => {
         const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return alert('로그인이 필요합니다.')
-
-        if (isLiked) {
-            await supabase.from('likes').delete().eq('list_id', listId).eq('user_id', user.id)
-            setLikeCount(prev => prev - 1)
-        } else {
-            await supabase.from('likes').insert({ list_id: listId, user_id: user.id })
-            setLikeCount(prev => prev + 1)
+        // 비로그인 시 처리
+        if (!user) {
+            alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.')
+            router.push(`/login?next=${encodeURIComponent(`/list/${listId}`)}`)
+            return
         }
+
+        let result
+        if (isLiked) {
+            result = await supabase.from('likes').delete().eq('list_id', listId).eq('user_id', user.id)
+        } else {
+            result = await supabase.from('likes').insert({ list_id: listId, user_id: user.id })
+        }
+
+        if (result.error) {
+            const handler = handleAuthError(result.error, router, `/list/${listId}`)
+            if (handler) return // 로그인 페이지로 리다이렉팅 했으므로 종료
+
+            alert('좋아요 처리 중 오류가 발생했습니다.')
+            return
+        }
+
         setIsLiked(!isLiked)
+        setLikeCount(prev => isLiked ? prev - 1 : prev + 1)
     }
 
     return (
