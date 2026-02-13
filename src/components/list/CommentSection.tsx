@@ -48,6 +48,7 @@ export default function CommentSection({ listId }: { listId: string }) {
 
     // 댓글 삭제
     const handleDelete = async (commentId: string) => {
+        if (!currentUserId) return alert('로그인이 필요합니다.')
         if (!confirm('정말 삭제하시겠습니까?')) return
 
         const { error } = await supabase
@@ -61,6 +62,7 @@ export default function CommentSection({ listId }: { listId: string }) {
 
     // 댓글 수정 저장
     const handleUpdate = async (commentId: string) => {
+        if (!currentUserId) return alert('로그인이 필요합니다.')
         if (!editContent.trim()) return
 
         const { error } = await supabase
