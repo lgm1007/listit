@@ -3,9 +3,13 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { createClient } from '@/utils/supabase/client'
+import { useRouter } from 'next/navigation'
+import { handleAuthError } from '@/utils/authErrorHandler'
 
 export default function CommentSection({ listId }: { listId: string }) {
     const supabase = createClient()
+    const router = useRouter()
+
     const [comments, setComments] = useState<any[]>([])
     const [newComment, setNewComment] = useState('')
     const [currentUserId, setCurrentUserId] = useState<string | null>(null)
@@ -13,6 +17,16 @@ export default function CommentSection({ listId }: { listId: string }) {
     // 수정 모드 상태
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editContent, setEditContent] = useState('')
+
+    // 로그인 체크 공통 함수
+    const checkAuth = async () => {
+        if (!currentUserId) {
+            alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.')
+            router.push(`/login?next=/list/${listId}`)
+            return false
+        }
+        return true
+    }
 
     const fetchComments = async () => {
         const { data: { user } } = await supabase.auth.getUser()
@@ -31,7 +45,8 @@ export default function CommentSection({ listId }: { listId: string }) {
     // 댓글 등록
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!currentUserId) return alert('로그인이 필요합니다.')
+        // 로그인 체크
+        if (!await checkAuth()) return
         if (!newComment.trim()) return
 
         const { error } = await supabase.from('comments').insert({
@@ -40,15 +55,18 @@ export default function CommentSection({ listId }: { listId: string }) {
             content: newComment
         })
 
-        if (!error) {
-            setNewComment('')
-            fetchComments()
+        if (error) {
+            // 401 에러 체크 및 리다이렉팅
+            handleAuthError(error, router)
+            return
         }
+
+        setNewComment('')
+        fetchComments()
     }
 
     // 댓글 삭제
     const handleDelete = async (commentId: string) => {
-        if (!currentUserId) return alert('로그인이 필요합니다.')
         if (!confirm('정말 삭제하시겠습니까?')) return
 
         const { error } = await supabase
@@ -56,13 +74,18 @@ export default function CommentSection({ listId }: { listId: string }) {
             .delete()
             .eq('id', commentId)
             .eq('user_id', currentUserId)
-        if (error) alert('삭제 실패: ' + error.message)
-        else fetchComments()
+
+        if (error) {
+            // 401 에러 체크 및 리다이렉팅
+            handleAuthError(error, router)
+            return
+        }
+
+        fetchComments()
     }
 
     // 댓글 수정 저장
     const handleUpdate = async (commentId: string) => {
-        if (!currentUserId) return alert('로그인이 필요합니다.')
         if (!editContent.trim()) return
 
         const { error } = await supabase
@@ -72,11 +95,13 @@ export default function CommentSection({ listId }: { listId: string }) {
             .eq('user_id', currentUserId)
 
         if (error) {
-            alert('수정 실패: ' + error.message)
-        } else {
-            setEditingId(null)
-            fetchComments()
+            // 401 에러 체크 및 리다이렉팅
+            handleAuthError(error, router)
+            return
         }
+
+        setEditingId(null)
+        fetchComments()
     }
 
     return (
