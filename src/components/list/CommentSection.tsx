@@ -22,7 +22,7 @@ export default function CommentSection({ listId }: { listId: string }) {
     const checkAuth = async () => {
         if (!currentUserId) {
             alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.')
-            router.push(`/login?next=/list/${listId}`)
+            router.push(`/login?next=/${encodeURIComponent(`list/${listId}`)}`)
             return false
         }
         return true
