@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { handleAuthError } from '@/utils/authErrorHandler'
+import AuthModal from '@/src/components/AuthModal'
 
 export default function LikeButton({ listId }: { listId: string }) {
     const supabase = createClient()
@@ -11,6 +12,7 @@ export default function LikeButton({ listId }: { listId: string }) {
 
     const [isLiked, setIsLiked] = useState(false)
     const [likeCount, setLikeCount] = useState(0)
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
     useEffect(() => {
         const fetchLikeData = async () => {
@@ -44,8 +46,7 @@ export default function LikeButton({ listId }: { listId: string }) {
         const { data: { user } } = await supabase.auth.getUser()
         // 비로그인 시 처리
         if (!user) {
-            alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.')
-            router.push(`/login?next=${encodeURIComponent(`/list/${listId}`)}`)
+            setIsAuthModalOpen(true)
             return
         }
 
@@ -69,15 +70,23 @@ export default function LikeButton({ listId }: { listId: string }) {
     }
 
     return (
-        <button
-            onClick={toggleLike}
-            className={`flex flex-col items-center gap-2 transition-transform active:scale-90 cursor-pointer group`}
-        >
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center border-2 transition-all ${isLiked ? 'bg-red-50 border-red-500 text-red-500' : 'bg-white border-gray-200 text-gray-400'
-                }`}>
-                <span className="text-3xl">{isLiked ? '❤️' : '🤍'}</span>
-            </div>
-            <span className="font-bold text-gray-600">{likeCount}</span>
-        </button>
+        <>
+            <button
+                onClick={toggleLike}
+                className={`flex flex-col items-center gap-2 transition-transform active:scale-90 cursor-pointer group`}
+            >
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center border-2 transition-all ${isLiked ? 'bg-red-50 border-red-500 text-red-500' : 'bg-white border-gray-200 text-gray-400'
+                    }`}>
+                    <span className="text-3xl">{isLiked ? '❤️' : '🤍'}</span>
+                </div>
+                <span className="font-bold text-gray-600">{likeCount}</span>
+            </button>
+
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                nextPath={`/list/${listId}`}
+            />
+        </>
     )
 }
