@@ -20,7 +20,14 @@ export default function LoginForm() {
 
     // 현재 URL에서 'next' 파라미터 추출 (로그인 성공 후 돌아갈 페이지)
     const searchParams = useSearchParams()
-    const next = searchParams.get('next') || '/' // 없으면 메인으로
+    const nextParam = searchParams.get('next') || '/' // 없으면 메인으로
+
+    // Open Redirect 방어: 내부 경로만 허용
+    // - '/'로 시작해야 함 (상대 경로만 허용)
+    // - '//'로 시작하면 프로토콜 상대 URL이므로 차단 (예: //attacker.com)
+    // - '@' 문자가 포함되면 차단 (예: /login@attacker.com)
+    const isSafePath = nextParam.startsWith('/') && !nextParam.startsWith('//') && !nextParam.includes('@')
+    const next = isSafePath ? nextParam : '/'
 
     /**
      * 이메일과 비밀번호로 로그인 수행
