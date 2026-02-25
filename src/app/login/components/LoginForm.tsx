@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 
 /**
  * 사용자 로그인을 담당하는 클라이언트 컴포넌트
@@ -16,6 +17,17 @@ export default function LoginForm() {
     const router = useRouter()
     // 클라이언트용 Supabase 객체 생성 (client.ts는 동기 방식)
     const supabase = createClient()
+
+    // 현재 URL에서 'next' 파라미터 추출 (로그인 성공 후 돌아갈 페이지)
+    const searchParams = useSearchParams()
+    const nextParam = searchParams.get('next') || '/' // 없으면 메인으로
+
+    // Open Redirect 방어: 내부 경로만 허용
+    // - '/'로 시작해야 함 (상대 경로만 허용)
+    // - '//'로 시작하면 프로토콜 상대 URL이므로 차단 (예: //attacker.com)
+    // - '@' 문자가 포함되면 차단 (예: /login@attacker.com)
+    const isSafePath = nextParam.startsWith('/') && !nextParam.startsWith('//') && !nextParam.includes('@')
+    const next = isSafePath ? nextParam : '/'
 
     /**
      * 이메일과 비밀번호로 로그인 수행
@@ -35,7 +47,7 @@ export default function LoginForm() {
                 setErrorMessage(`로그인 실패: ${error.message}`)
             } else {
                 // 로그인 성공 시 메인 페이지로 이동하고 페이지를 새로고침하여 세션 반영
-                router.push('/')
+                router.push(next)
                 router.refresh()
             }
         } finally {
@@ -50,12 +62,14 @@ export default function LoginForm() {
         setLoading(true)
         setErrorMessage(null)
 
+        const redirectURL = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+
         try {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
                     // 인증 완료 후 위에서 만든 callback 라우트로 돌아오기
-                    redirectTo: `${window.location.origin}/auth/callback`,
+                    redirectTo: redirectURL,
                 },
             })
 

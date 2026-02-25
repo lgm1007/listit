@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { handleAuthError } from '@/utils/authErrorHandler'
+import AuthModal from '@/src/components/AuthModal'
 
 export default function CommentSection({ listId }: { listId: string }) {
     const supabase = createClient()
@@ -13,6 +14,7 @@ export default function CommentSection({ listId }: { listId: string }) {
     const [comments, setComments] = useState<any[]>([])
     const [newComment, setNewComment] = useState('')
     const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
     // 수정 모드 상태
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -21,8 +23,7 @@ export default function CommentSection({ listId }: { listId: string }) {
     // 로그인 체크 공통 함수
     const checkAuth = async () => {
         if (!currentUserId) {
-            alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.')
-            router.push(`/login?next=/${encodeURIComponent(`list/${listId}`)}`)
+            setIsAuthModalOpen(true)    // Auth 모달 띄우기
             return false
         }
         return true
@@ -190,6 +191,13 @@ export default function CommentSection({ listId }: { listId: string }) {
                     </div>
                 ))}
             </div>
+
+            {/* 로그인 인증 모달 */}
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                nextPath={`/list/${listId}`}
+            />
         </div>
     )
 }
