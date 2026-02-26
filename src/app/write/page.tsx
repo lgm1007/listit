@@ -245,7 +245,7 @@ export default function WritePage() {
                                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                                     {/* 기존 이미지 미리보기 카드들 */}
                                     {item.previewUrls.map((url, imgIdx) => (
-                                        <div key={imgIdx} className="relative w-40 h-40 flex-none rounded-2xl overflow-hidden border border-gray-100">
+                                        <div key={url} className="relative w-40 h-40 flex-none rounded-2xl overflow-hidden border border-gray-100">
                                             <img src={url} className="w-full h-full object-cover" />
                                             <button
                                                 type="button"
