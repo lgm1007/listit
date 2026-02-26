@@ -1,26 +1,45 @@
 @import "tailwindcss";
 
+@theme {
+  /* 테마별로 변할 색상들을 미리 정의합니다. */
+  --color-main-bg: var(--main-bg);
+  --color-main-text: var(--main-text);
+  --color-sub-text: var(--sub-text);
+  --color-border: var(--border-color);
+  --color-card-bg: var(--card-bg);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 라이트 모드 변수 값 */
+  --main-bg: #ffffff;
+  --main-text: #18181b;
+  /* zinc-900 */
+  --sub-text: #71717a;
+  /* zinc-500 */
+  --border-color: #f4f4f5;
+  /* zinc-100 */
+  --card-bg: #fafafa;
+  /* zinc-50 */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  /* 다크 모드일 때 변수 값만 교체 */
+  --main-bg: #09090b;
+  /* zinc-950 */
+  --main-text: #f4f4f5;
+  /* zinc-100 */
+  --sub-text: #a1a1aa;
+  /* zinc-400 */
+  --border-color: #27272a;
+  /* zinc-800 */
+  --card-bg: #18181b;
+  /* zinc-900 */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: var(--main-bg);
+    color: var(--main-text);
+    @apply transition-colors duration-300;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
