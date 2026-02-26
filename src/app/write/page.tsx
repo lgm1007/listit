@@ -8,6 +8,7 @@ import { saveList } from './action'
 import { compressImage } from '@/utils/imageControl'
 import { handleAuthError } from '@/utils/authErrorHandler'
 import { CATEGORY_NAMES } from '../../constants/categories'
+import ErrorModal from '@/src/components/ErrorModal'
 
 interface ListItemInput {
     title: string
@@ -22,6 +23,20 @@ interface ListItemInput {
 export default function WritePage() {
     const router = useRouter()
     const supabase = createClient()
+
+    const [errorModal, setErrorModal] = useState({
+        isOpen: false,
+        title: '',
+        message: ''
+    })
+
+    const showError = (message: string, title: string = "알림") => {
+        setErrorModal({
+            isOpen: true,
+            title,
+            message
+        })
+    }
 
     // 1. 메인 리스트 상태
     const [title, setTitle] = useState('')
@@ -61,7 +76,7 @@ export default function WritePage() {
 
         // 2. 이미지 장수 5장 제한 체크
         if (currentItem.images.length + files.length > 5) {
-            alert('이미지는 최대 5장까지만 업로드할 수 있습니다.')
+            showError('이미지는 최대 5장까지만 업로드할 수 있습니다.', '이미지 개수 초과')
             return
         }
 
@@ -123,6 +138,12 @@ export default function WritePage() {
         e.preventDefault()
         if (isSubmitting) return
 
+        // 리스트 제목 (필수값) 유효성 검사
+        if (!title.trim()) {
+            showError('리스트의 제목을 입력해 주세요.', '입력 확인')
+            return
+        }
+
         setIsSubmitting(true)
 
         try {
@@ -162,7 +183,7 @@ export default function WritePage() {
 
         } catch (error: any) {
             console.error(error)
-            alert('저장 중 오류가 발생했습니다.')
+            showError('저장 중 예기치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', '저장 실패')
         } finally {
             setIsSubmitting(false)
         }
@@ -293,6 +314,14 @@ export default function WritePage() {
                     </button>
                 </div>
             </form>
+
+            {/* 에러 모달 배치 */}
+            <ErrorModal
+                isOpen={errorModal.isOpen}
+                onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+                title={errorModal.title}
+                message={errorModal.message}
+            />
         </main>
     )
 }
