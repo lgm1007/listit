@@ -226,14 +226,14 @@ export default function WritePage() {
     }
 
     return (
-        <main className="max-w-3xl mx-auto py-10 px-4">
+        <main className="max-w-3xl mx-auto py-10 px-4 bg-main-bg text-main-text">
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* 메인 리스트 정보 (기존과 동일) */}
                 <section className="space-y-4">
                     <input
                         type="text"
                         placeholder="제목을 입력해주세요"
-                        className="w-full text-3xl font-bold border-none focus:ring-0 placeholder:text-gray-300"
+                        className="w-full text-3xl font-bold border-none focus:ring-0 bg-main-bg placeholder:text-sub-text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         required
@@ -244,7 +244,9 @@ export default function WritePage() {
                                 key={cat}
                                 type="button"
                                 onClick={() => setCategory(cat)}
-                                className={`px-4 py-1.5 rounded-full text-sm border transition ${category === cat ? 'bg-black text-white border-black' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400'
+                                className={`px-4 py-1.5 rounded-full text-sm border transition cursor-pointer ${category === cat
+                                    ? 'bg-main-text text-main-bg border-border'
+                                    : 'bg-main-bg text-main-text border-border hover:border-sub-text'
                                     }`}
                             >
                                 {cat}
@@ -253,12 +255,12 @@ export default function WritePage() {
                     </div>
                 </section>
 
-                <hr className="border-gray-100" />
+                <hr className="border-border" />
 
                 {/* 아이템 리스트 섹션 */}
                 <section className="space-y-12">
                     {items.map((item, index) => (
-                        <div key={index} className="flex gap-4 relative border-b border-gray-50 pb-12 last:border-0">
+                        <div key={index} className="flex gap-4 relative border-b border-border pb-12 last:border-0">
                             {/* 항목 삭제 버튼 */}
                             {items.length > 1 && (
                                 <button
@@ -270,7 +272,7 @@ export default function WritePage() {
                                 </button>
                             )}
 
-                            <div className="flex-none w-8 h-8 bg-black text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            <div className="flex-none w-8 h-8 bg-main-text text-main-bg rounded-full flex items-center justify-center font-bold text-sm">
                                 {index + 1}
                             </div>
 
@@ -284,12 +286,12 @@ export default function WritePage() {
                                 >
                                     {/* 이미지 미리보기 카드들 */}
                                     {item.previewUrls.map((url, imgIdx) => (
-                                        <div key={url} className="relative w-40 h-40 flex-none rounded-2xl overflow-hidden border border-gray-100 bg-white">
+                                        <div key={url} className="relative w-40 h-40 flex-none rounded-2xl overflow-hidden border border-border bg-main-bg">
                                             <img src={url} className="w-full h-full object-cover" alt="preview" />
                                             <button
                                                 type="button"
                                                 onClick={() => removeSpecificImage(index, imgIdx)}
-                                                className="absolute top-2 right-2 w-6 h-6 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black transition"
+                                                className="absolute top-2 right-2 w-6 h-6 bg-black/50 text-main-bg rounded-full flex items-center justify-center hover:bg-main-text transition"
                                             >
                                                 ×
                                             </button>
@@ -299,11 +301,11 @@ export default function WritePage() {
                                     {/* 이미지 추가 버튼 (드래그 앤 드롭 타겟) */}
                                     {item.images.length < 5 && (
                                         <label className={`w-40 h-40 flex-none border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition group ${draggingIndex === index
-                                            ? 'bg-blue-100 border-blue-400'
-                                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                            ? 'bg-blue-100 border-blue-400 dark:bg-blue-900/20 dark:border-blue-700'
+                                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100 dark:bg-zinc-900 dark:border-zinc-800'
                                             }`}>
                                             <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition">
-                                                <span className={`text-xl ${draggingIndex === index ? 'text-blue-500' : 'text-gray-500'}`}>+</span>
+                                                <span className={`text-xl ${draggingIndex === index ? 'text-blue-500' : 'text-gray-500 dark:text-zinc-500'}`}>+</span>
                                             </div>
                                             <span className="text-gray-400 text-xs font-bold text-center px-2">
                                                 {draggingIndex === index ? '여기에 놓으세요!' : `${item.images.length}/5 클릭 또는 드래그`}
@@ -322,14 +324,14 @@ export default function WritePage() {
                                 <input
                                     type="text"
                                     placeholder="항목의 제목을 적어주세요"
-                                    className="w-full text-xl font-bold border-none focus:ring-0 p-0"
+                                    className="w-full text-xl font-bold border-none text-sub-text focus:ring-0 p-0"
                                     value={item.title}
                                     onChange={(e) => updateItem(index, 'title', e.target.value)}
                                     required
                                 />
                                 <textarea
                                     placeholder="상세 내용을 입력하세요 (선택 사항)"
-                                    className="w-full border-none focus:ring-0 resize-none text-gray-600 p-0"
+                                    className="w-full border-none focus:ring-0 resize-none text-sub-text p-0"
                                     rows={3}
                                     value={item.content}
                                     onChange={(e) => updateItem(index, 'content', e.target.value)}
@@ -344,14 +346,14 @@ export default function WritePage() {
                     <button
                         type="button"
                         onClick={addItem}
-                        className="w-full py-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 hover:border-gray-400 transition font-bold"
+                        className="w-full py-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 hover:border-gray-400 transition font-bold cursor-pointer"
                     >
                         + 항목 추가하기
                     </button>
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className={`w-full py-4 rounded-xl font-bold text-lg transition ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800 shadow-lg'
+                        className={`w-full py-4 rounded-xl font-bold text-lg transition cursor-pointer ${isSubmitting ? 'bg-gray-500 cursor-not-allowed' : 'bg-main-text text-main-bg hover:bg-gray-500 shadow-lg'
                             }`}
                     >
                         {isSubmitting ? '리스트를 만드는 중...' : '리스트 등록 완료'}
