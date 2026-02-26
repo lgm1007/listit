@@ -41,12 +41,14 @@ export default function ImageSlider({ images, title }: ImageSliderProps) {
                 <>
                     <button
                         onClick={prevSlide}
+                        aria-label='이전 이미지'
                         className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur rounded-full flex items-center justify-center shadow-md hover:bg-white transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
                     >
                         <span className="text-xl">←</span>
                     </button>
                     <button
                         onClick={nextSlide}
+                        aria-label='다음 이미지'
                         className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur rounded-full flex items-center justify-center shadow-md hover:bg-white transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
                     >
                         <span className="text-xl">→</span>
