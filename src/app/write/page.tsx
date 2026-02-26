@@ -75,16 +75,16 @@ export default function WritePage() {
 
         const currentItem = items[index]
 
-        // 이미지 장수 5장 제한 체크
-        if (currentItem.images.length + files.length > 5) {
-            showError('이미지는 최대 5장까지만 업로드할 수 있습니다.', '이미지 개수 초과')
-            return
-        }
-
         // 이미지 파일만 필터링
         const imageFiles = files.filter(file => file.type.startsWith('image/'))
         if (imageFiles.length !== files.length) {
             showError('이미지 파일만 업로드 가능합니다.', '형식 오류')
+            return
+        }
+
+        // 이미지 장수 5장 제한 체크
+        if (currentItem.images.length + imageFiles.length > 5) {
+            showError('이미지는 최대 5장까지만 업로드할 수 있습니다.', '이미지 개수 초과')
             return
         }
 
