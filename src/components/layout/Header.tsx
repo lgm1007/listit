@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
+import ThemeToggle from '@/src/components/ThemeToggle'
 
 interface HeaderProps {
     userProfile: {
@@ -83,6 +84,7 @@ export default function Header({ userProfile }: HeaderProps) {
                             시작하기
                         </Link>
                     )}
+                    <ThemeToggle />
                 </nav>
             </div>
         </header>
