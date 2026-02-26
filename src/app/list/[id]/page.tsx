@@ -52,7 +52,7 @@ export default async function ListDetailPage({ params }: { params: { id: string 
             <section className="space-y-24 mb-20">
                 {sortedItems.map((item, index: number) => {
                     // 해당 아이템의 이미지들 정렬
-                    const itemImages = item.item_images?.sort((a: any, b: any) => a.order_no - b.order_no) || []
+                    const itemImages = [...(item.item_images || [])].sort((a, b) => a.order_no - b.order_no)
 
                     return (
                         <div key={item.id} className="group">
