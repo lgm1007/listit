@@ -29,7 +29,7 @@ export default function SearchInput({ defaultValue }: { defaultValue: string }) 
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="어떤 리스트를 찾으시나요?"
-                className="w-full px-6 py-4 bg-gray-100 border-none rounded-2xl focus:ring-2 focus:ring-black transition outline-none"
+                className="w-full px-6 py-4 bg-gray-100 border-none text-gray-900 rounded-2xl focus:ring-2 focus:ring-black transition outline-none"
             />
         </form>
     )

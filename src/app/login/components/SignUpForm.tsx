@@ -78,17 +78,17 @@ export default function SignUpForm() {
     }
 
     return (
-        <form onSubmit={handleSignUp} className="flex flex-col gap-2 w-full max-w-sm mx-auto p-4 border rounded-lg mt-4">
-            <h2 className="text-xl font-bold mb-4">새 계정 만들기</h2>
+        <form onSubmit={handleSignUp} className="flex flex-col gap-2 w-full max-w-sm mx-auto p-4 border border-border bg-card-bg rounded-lg mt-4">
+            <h2 className="text-xl font-bold mb-2 text-main-text">새 계정 만들기</h2>
 
             {errorMessage && (
-                <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg text-sm">
+                <div className="bg-red-500/10 border border-red-500/50 text-error px-4 py-2 rounded-lg text-sm">
                     {errorMessage}
                 </div>
             )}
 
             {successMessage && (
-                <div className="bg-green-50 border border-green-300 text-green-700 px-4 py-3 rounded-lg text-sm">
+                <div className="bg-green-500/10 border border-green-500/50 text-success px-4 py-2 rounded-lg text-sm">
                     {successMessage}
                 </div>
             )}
@@ -98,14 +98,14 @@ export default function SignUpForm() {
                 placeholder="이메일 주소"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="border p-2 rounded text-black"
+                className="bg-main-bg border border-border p-3 rounded text-main-text focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
             />
             <input
                 type="password"
                 placeholder="비밀번호 (영문 + 숫자 조합, 8자 이상)"
                 ref={passwordRef}
-                className="border p-2 rounded text-black"
+                className="bg-main-bg border border-border p-3 rounded text-main-text focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
                 autoComplete="new-password" // 기존 비밀번호 자동완성 방지 및 새 비밀번호 저장 제안 받기
             />
@@ -113,14 +113,14 @@ export default function SignUpForm() {
                 type="password"
                 placeholder="비밀번호 확인"
                 ref={confirmPasswordRef}
-                className="border p-2 rounded text-black"
+                className="bg-main-bg border border-border p-3 rounded text-main-text focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
                 autoComplete="new-password"
             />
             <button
                 type="submit"
                 disabled={loading}  // 비동기 응답을 기다리는 동안 버튼 비활성화
-                className="bg-green-600 text-white p-2 rounded hover:bg-green-700 disabled:bg-gray-400"
+                className="bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:bg-zinc-500 mt-2 cursor-pointer"
             >
                 {loading ? '처리 중...' : '회원가입'}
             </button>

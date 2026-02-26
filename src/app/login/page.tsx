@@ -7,16 +7,16 @@ import SignUpForm from './components/SignUpForm'
  */
 export default function LoginPage() {
     return (
-        <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+        <main className="min-h-screen bg-main-bg flex flex-col items-center justify-center p-4">
             <div className="w-full max-w-md space-y-8">
                 {/* 로그인 폼 */}
                 <LoginForm />
 
                 {/* 구분선 */}
                 <div className="relative flex py-5 items-center">
-                    <div className="flex-grow border-t border-gray-300"></div>
-                    <span className="flex-shrink mx-4 text-gray-400 text-sm">신규 사용자라면?</span>
-                    <div className="flex-grow border-t border-gray-300"></div>
+                    <div className="flex-grow border-t border-border"></div>
+                    <span className="flex-shrink mx-4 text-sub-text text-sm">신규 사용자라면?</span>
+                    <div className="flex-grow border-t border-border"></div>
                 </div>
 
                 {/* 회원가입 폼 */}

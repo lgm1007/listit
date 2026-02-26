@@ -116,9 +116,9 @@ export default function CommentSection({ listId }: { listId: string }) {
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     placeholder="리스트에 대한 생각을 남겨보세요!"
-                    className="flex-grow p-4 bg-gray-50 rounded-xl focus:ring-2 focus:ring-black outline-none border-none transition"
+                    className="flex-grow p-4 bg-gray-50 text-gray-900 rounded-xl focus:ring-2 focus:ring-black outline-none border-none transition"
                 />
-                <button className="px-6 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition cursor-pointer">등록</button>
+                <button className="px-6 bg-main-text text-main-bg rounded-xl font-bold hover:bg-gray-500 transition cursor-pointer">등록</button>
             </form>
 
             {/* 댓글 목록 */}
@@ -174,7 +174,7 @@ export default function CommentSection({ listId }: { listId: string }) {
                                     <textarea
                                         value={editContent}
                                         onChange={(e) => setEditContent(e.target.value)}
-                                        className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-1 focus:ring-black"
+                                        className="w-full p-3 bg-main-bg border border-gray-200 rounded-lg text-sm outline-none focus:ring-1 focus:ring-black"
                                         rows={3}
                                     />
                                     <div className="flex gap-2 justify-end">
@@ -183,7 +183,7 @@ export default function CommentSection({ listId }: { listId: string }) {
                                     </div>
                                 </div>
                             ) : (
-                                <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">
+                                <p className="text-sm leading-relaxed whitespace-pre-wrap">
                                     {comment.content}
                                 </p>
                             )}
