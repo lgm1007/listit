@@ -75,7 +75,7 @@ export default function LikeButton({ listId }: { listId: string }) {
                 onClick={toggleLike}
                 className={`flex flex-col items-center gap-2 transition-transform active:scale-90 cursor-pointer group`}
             >
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center border-2 transition-all ${isLiked ? 'bg-red-50 border-red-500 text-red-500' : 'bg-white border-gray-200 text-gray-400'
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center border-2 transition-all ${isLiked ? 'bg-red-100 border-red-500 text-red-500' : 'bg-main-bg border-gray-200 text-sub-text'
                     }`}>
                     <span className="text-3xl">{isLiked ? '❤️' : '🤍'}</span>
                 </div>

@@ -35,16 +35,16 @@ export default async function ListDetailPage({ params }: { params: { id: string 
                 <span className="inline-block px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-bold mb-4">
                     {list.category}
                 </span>
-                <h1 className="text-4xl font-black mb-6 leading-tight">{list.title}</h1>
+                <h1 className="text-4xl text-main-text font-black mb-6 leading-tight">{list.title}</h1>
                 <div className="flex items-center justify-center gap-3 text-sm text-gray-600">
                     <div className="w-8 h-8 bg-gray-200 rounded-full overflow-hidden relative">
                         {list.profiles?.avatar_url && (
                             <Image src={list.profiles.avatar_url} alt="avatar" fill className="object-cover" />
                         )}
                     </div>
-                    <span className="font-semibold">{list.profiles?.username}</span>
+                    <span className="font-semibold text-sub-text">{list.profiles?.username}</span>
                     <span className="text-gray-300">|</span>
-                    <span>{new Date(list.created_at).toLocaleDateString()}</span>
+                    <span className="text-sub-text">{new Date(list.created_at).toLocaleDateString()}</span>
                 </div>
             </header>
 
@@ -57,16 +57,16 @@ export default async function ListDetailPage({ params }: { params: { id: string 
                     return (
                         <div key={item.id} className="group">
                             <div className="flex items-center gap-4 mb-6">
-                                <span className="flex-none w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-black text-lg shadow-lg">
+                                <span className="flex-none w-10 h-10 bg-main-text text-main-bg rounded-full flex items-center justify-center font-black text-lg shadow-lg">
                                     {index + 1}
                                 </span>
-                                <h2 className="text-2xl font-bold tracking-tight">{item.title}</h2>
+                                <h2 className="text-2xl text-main-text font-bold tracking-tight">{item.title}</h2>
                             </div>
 
                             {/* 슬라이더 적용 */}
                             <ImageSlider images={itemImages} title={item.title} />
 
-                            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap pl-0 md:pl-14 text-lg">
+                            <p className="text-main-text leading-relaxed whitespace-pre-wrap pl-0 md:pl-14 text-lg">
                                 {item.content}
                             </p>
                         </div>
@@ -74,7 +74,7 @@ export default async function ListDetailPage({ params }: { params: { id: string 
                 })}
             </section>
 
-            <hr className="border-gray-100 mb-10" />
+            <hr className="border-border mb-10" />
 
             <section className="flex flex-col items-center gap-8 mb-20">
                 <LikeButton listId={id} />
