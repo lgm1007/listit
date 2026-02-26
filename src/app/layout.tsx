@@ -1,6 +1,7 @@
 import Header from '@/src/components/layout/Header'
 import { createClient } from '@/utils/supabase/server'
 import './globals.css'
+import { ThemeProvider } from '@/src/components/ThemeProvider'
 
 /**
  * 루트 레이아웃 컴포넌트
@@ -38,10 +39,12 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body>
-        <Header userProfile={userProfile} />
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <Header userProfile={userProfile} />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )
