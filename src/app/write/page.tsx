@@ -117,7 +117,9 @@ export default function WritePage() {
 
     const handleDragLeave = (e: React.DragEvent) => {
         e.preventDefault()
-        setDraggingIndex(null)
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setDraggingIndex(null)
+        }
     }
 
     const handleDrop = (e: React.DragEvent, index: number) => {
