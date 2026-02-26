@@ -179,6 +179,8 @@ export default function WritePage() {
             if (result.success) {
                 alert('리스트가 등록되었습니다.')
                 router.push('/')
+            } else {
+                showError('리스트 저장에 실패했습니다. 잠시 후 다시 시도해주세요.', '저장 실패')
             }
 
         } catch (error: any) {
