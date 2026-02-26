@@ -82,11 +82,11 @@ export default function LoginForm() {
     }
 
     return (
-        <div className="flex flex-col gap-4 w-full max-w-sm mx-auto p-6 bg-white shadow-md rounded-xl">
-            <h1 className="text-2xl font-bold text-center text-gray-800">리스팃 로그인</h1>
+        <div className="flex flex-col gap-4 w-full max-w-sm mx-auto p-6 bg-card-bg shadow-xl rounded-2xl border border-border">
+            <h1 className="text-2xl font-bold text-center text-main-text">리스팃 로그인</h1>
 
             {errorMessage && (
-                <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg text-sm">
+                <div className="bg-red-500/10 border border-red-500/50 text-error px-4 py-3 rounded-lg text-sm">
                     {errorMessage}
                 </div>
             )}
@@ -97,7 +97,7 @@ export default function LoginForm() {
                     placeholder="이메일"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="border p-3 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="bg-main-bg border border-border p-3 rounded-lg text-main-text focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                     required
                 />
                 <input
@@ -105,27 +105,27 @@ export default function LoginForm() {
                     placeholder="비밀번호"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="border p-3 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="bg-main-bg border border-border p-3 rounded-lg text-main-text focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                     required
                 />
                 <button
                     type="submit"
                     disabled={loading}
-                    className="bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-gray-400"
+                    className="bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-zinc-500 cursor-pointer"
                 >
                     {loading ? '로그인 중...' : '이메일 로그인'}
                 </button>
             </form>
 
             <div className="relative flex py-3 items-center">
-                <div className="flex-grow border-t border-gray-200"></div>
-                <span className="flex-shrink mx-4 text-gray-400 text-sm">또는</span>
-                <div className="flex-grow border-t border-gray-200"></div>
+                <div className="flex-grow border-t border-border"></div>
+                <span className="flex-shrink mx-4 text-sub-text text-sm">또는</span>
+                <div className="flex-grow border-t border-border"></div>
             </div>
 
             <button
                 onClick={handleGoogleLogin}
-                className="border border-gray-300 p-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition text-gray-700"
+                className="bg-main-bg border border-border p-3 rounded-lg flex items-center justify-center gap-2 hover:bg-zinc-200 transition text-main-text cursor-pointer"
             >
                 <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
                 구글로 계속하기
