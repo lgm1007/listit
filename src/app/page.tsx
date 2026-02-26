@@ -26,7 +26,13 @@ export default async function Home({
       title,
       category,
       profiles (username),
-      list_items (image_url, order_no)
+      list_items (
+        order_no,
+        item_images (
+          image_url,
+          order_no
+        )
+      )
     `)
     .order('created_at', { ascending: false })
 
@@ -76,12 +82,17 @@ export default async function Home({
       {/* 리스트 그리드 피드 */}
       <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6">
         {lists?.map((list) => {
-          // profiles가 배열로 들어올 경우를 대비해 첫 번째 요소 가져오기, 객체라면 그대로 객체 사용
           const profileData = Array.isArray(list.profiles) ? list.profiles[0] : list.profiles;
 
-          // order_no가 0인 이미지 찾기
-          const representativeItem = list.list_items.find(item => item.order_no === 0)
-          const thumbnail = representativeItem?.image_url || CATEGORY_IMAGE[list.category || '기타']
+          /**
+           * 썸네일 결정 로직:
+           * 1. 리스트의 첫 번째 아이템(list_items의 order_no === 0)을 찾습니다.
+           * 2. 그 아이템의 첫 번째 이미지(item_images의 order_no === 0)를 찾습니다.
+           */
+          const firstItem = list.list_items.find(item => item.order_no === 0)
+          const firstImage = firstItem?.item_images?.find(img => img.order_no === 0)
+
+          const thumbnail = firstImage?.image_url || CATEGORY_IMAGE[list.category || '기타']
 
           return (
             <Link key={list.id} href={`/list/${list.id}`} className="group cursor-pointer">
@@ -90,6 +101,7 @@ export default async function Home({
                   src={thumbnail}
                   alt={list.title}
                   fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 20vw, 15vw"
                   className="object-cover group-hover:scale-105 transition duration-300"
                 />
               </div>
