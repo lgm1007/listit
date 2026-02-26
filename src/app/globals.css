@@ -7,6 +7,8 @@
   --color-sub-text: var(--sub-text);
   --color-border: var(--border-color);
   --color-card-bg: var(--card-bg);
+  --color-success: var(--success);
+  --color-error: var(--error);
 }
 
 :root {
@@ -20,6 +22,10 @@
   /* zinc-100 */
   --card-bg: #fafafa;
   /* zinc-50 */
+  --success: #10b981;
+  /* green-600 */
+  --error: #ef4444;
+  /* red-600 */
 }
 
 .dark {
@@ -34,6 +40,10 @@
   /* zinc-800 */
   --card-bg: #18181b;
   /* zinc-900 */
+  --success: #34d399;
+  /* green-400 */
+  --error: #f87171;
+  /* red-400 */
 }
 
 @layer base {
