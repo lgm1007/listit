@@ -48,6 +48,9 @@ export default function WritePage() {
         { title: '', content: '', images: [], previewUrls: [] }
     ])
 
+    // 드래그 중인 아이템 인덱스 저장 (이미지 드래그 앤 드랍)
+    const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
+
     /**
      * 새로운 리스트 아이템 입력 칸 추가
      */
@@ -65,35 +68,64 @@ export default function WritePage() {
     }
 
     /**
-     * 다중 이미지 선택 처리
+     * 파일 처리 공통 로직 (Input과 Drop 모두 사용)
      */
-    const handleImageChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-        // 1. 파일 선택되었는지 확인
-        const files = Array.from(e.target.files || [])
-        if (files.length === 0) return;
+    const processFiles = (index: number, files: File[]) => {
+        if (files.length === 0) return
 
         const currentItem = items[index]
 
-        // 2. 이미지 장수 5장 제한 체크
+        // 이미지 장수 5장 제한 체크
         if (currentItem.images.length + files.length > 5) {
             showError('이미지는 최대 5장까지만 업로드할 수 있습니다.', '이미지 개수 초과')
             return
         }
 
-        // 3. 새 미리보기 URL 생성
-        const newPreviewUrls = files.map(file => URL.createObjectURL(file))
+        // 이미지 파일만 필터링
+        const imageFiles = files.filter(file => file.type.startsWith('image/'))
+        if (imageFiles.length !== files.length) {
+            showError('이미지 파일만 업로드 가능합니다.', '형식 오류')
+            return
+        }
 
-        // 4. 기존 updateItem 함수를 사용해 image와 previewUrl을 동시에 업데이트
+        const newPreviewUrls = imageFiles.map(file => URL.createObjectURL(file))
         const newItems = [...items]
         newItems[index] = {
             ...currentItem,
-            images: [...currentItem.images, ...files],
+            images: [...currentItem.images, ...imageFiles],
             previewUrls: [...currentItem.previewUrls, ...newPreviewUrls]
         }
         setItems(newItems)
+    }
 
-        // 같은 파일을 다시 선택할 수 있도록 target 초기화
+    /**
+     * 다중 이미지 선택 처리
+     */
+    const handleImageChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || [])
+        processFiles(index, files)
         e.target.value = ''
+    }
+
+    /**
+     * 드래그 앤 드롭 이벤트 핸들러
+     */
+    const handleDragOver = (e: React.DragEvent, index: number) => {
+        e.preventDefault()
+        setDraggingIndex(index)
+    }
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault()
+        setDraggingIndex(null)
+    }
+
+    const handleDrop = (e: React.DragEvent, index: number) => {
+        e.preventDefault()
+        setDraggingIndex(null)
+
+        const files = Array.from(e.dataTransfer.files)
+        processFiles(index, files)
     }
 
     /**
@@ -241,12 +273,17 @@ export default function WritePage() {
                             </div>
 
                             <div className="flex-grow space-y-4 overflow-hidden">
-                                {/* 다중 이미지 업로드 UI */}
-                                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                                    {/* 기존 이미지 미리보기 카드들 */}
+                                {/* 드래그 앤 드롭이 적용될 업로드 영역 */}
+                                <div
+                                    className={`flex gap-3 overflow-x-auto pb-2 scrollbar-hide p-2 rounded-2xl transition-colors ${draggingIndex === index ? 'bg-blue-50/50 ring-2 ring-blue-200 ring-dashed' : ''}`}
+                                    onDragOver={(e) => handleDragOver(e, index)}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={(e) => handleDrop(e, index)}
+                                >
+                                    {/* 이미지 미리보기 카드들 */}
                                     {item.previewUrls.map((url, imgIdx) => (
-                                        <div key={url} className="relative w-40 h-40 flex-none rounded-2xl overflow-hidden border border-gray-100">
-                                            <img src={url} className="w-full h-full object-cover" />
+                                        <div key={url} className="relative w-40 h-40 flex-none rounded-2xl overflow-hidden border border-gray-100 bg-white">
+                                            <img src={url} className="w-full h-full object-cover" alt="preview" />
                                             <button
                                                 type="button"
                                                 onClick={() => removeSpecificImage(index, imgIdx)}
@@ -257,14 +294,17 @@ export default function WritePage() {
                                         </div>
                                     ))}
 
-                                    {/* 이미지 추가 버튼 (5장 미만일 때만 표시) */}
+                                    {/* 이미지 추가 버튼 (드래그 앤 드롭 타겟) */}
                                     {item.images.length < 5 && (
-                                        <label className="w-40 h-40 flex-none bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition group">
+                                        <label className={`w-40 h-40 flex-none border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition group ${draggingIndex === index
+                                            ? 'bg-blue-100 border-blue-400'
+                                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                            }`}>
                                             <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition">
-                                                <span className="text-gray-500 text-xl">+</span>
+                                                <span className={`text-xl ${draggingIndex === index ? 'text-blue-500' : 'text-gray-500'}`}>+</span>
                                             </div>
-                                            <span className="text-gray-400 text-xs font-bold">
-                                                {item.images.length}/5
+                                            <span className="text-gray-400 text-xs font-bold text-center px-2">
+                                                {draggingIndex === index ? '여기에 놓으세요!' : `${item.images.length}/5 클릭 또는 드래그`}
                                             </span>
                                             <input
                                                 type="file"
