@@ -40,7 +40,7 @@ export default function Header({ userProfile }: HeaderProps) {
 
     return (
         // sticky, top-0, z-50: 스크롤 시 헤더가 상단에 고정되도록 설정
-        <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
+        <header className="border-b border-gray-200 bg-main-bg sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
                 {/* 로고 영역 */}
                 <Link href="/" className="flex items-center gap-2">
@@ -51,7 +51,7 @@ export default function Header({ userProfile }: HeaderProps) {
                         height={40}
                         className="object-contain"
                     />
-                    <span className="text-xl font-bold tracking-tighter text-gray-900">리스팃</span>
+                    <span className="text-xl font-bold tracking-tighter text-main-text">리스팃</span>
                 </Link>
 
                 {/* 메뉴 영역 */}
@@ -60,12 +60,12 @@ export default function Header({ userProfile }: HeaderProps) {
                         <>
                             <Link
                                 href="/write"
-                                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition"
+                                className="text-sm font-medium text-sub-text hover:text-main-text transition"
                             >
                                 글쓰기
                             </Link>
-                            <div className="flex items-center gap-3 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
-                                <span className="text-sm font-semibold text-gray-700">
+                            <div className="flex items-center gap-3 bg-border px-3 py-1.5 rounded-full border border-gray-100">
+                                <span className="text-sm font-semibold text-main-text">
                                     {userProfile.username || '사용자'}님
                                 </span>
                                 <button
@@ -79,7 +79,7 @@ export default function Header({ userProfile }: HeaderProps) {
                     ) : (
                         <Link
                             href="/login"
-                            className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition"
+                            className="bg-main-text text-main-bg px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-500 transition"
                         >
                             시작하기
                         </Link>

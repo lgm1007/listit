@@ -69,8 +69,8 @@ export default async function Home({
                 }
               }}
               className={`px-5 py-2 rounded-full text-sm font-medium transition ${category === cat
-                ? 'bg-black text-white'
-                : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-400'
+                ? 'bg-main-text text-main-bg'
+                : 'bg-main-bg border border-border text-main-text hover:border-sub-text'
                 }`}
             >
               {cat}
@@ -105,7 +105,7 @@ export default async function Home({
                   className="object-cover group-hover:scale-105 transition duration-300"
                 />
               </div>
-              <h3 className="font-bold text-gray-900 line-clamp-2 leading-tight group-hover:underline">
+              <h3 className="font-bold text-sub-text line-clamp-2 leading-tight group-hover:underline">
                 {list.title}
               </h3>
               <p className="text-xs text-gray-400 mt-1">
@@ -117,7 +117,7 @@ export default async function Home({
       </section>
 
       {lists?.length === 0 && (
-        <div className="text-center py-20 text-gray-400">
+        <div className="text-center py-20 text-border">
           찾으시는 리스트가 아직 없어요! 😅
         </div>
       )}
