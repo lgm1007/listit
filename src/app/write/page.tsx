@@ -58,7 +58,7 @@ export default function WritePage() {
     /**
      * 특정 순번의 리스트 아이템 값 수정
      */
-    const updateItem = (index: number, field: keyof ListItemInput, value: any) => {
+    const updateItem = <K extends keyof ListItemInput>(index: number, field: K, value: ListItemInput[K]) => {
         const newItems = [...items]
         newItems[index] = { ...newItems[index], [field]: value }
         setItems(newItems)
