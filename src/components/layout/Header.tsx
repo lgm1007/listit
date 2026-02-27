@@ -10,7 +10,7 @@ import ThemeToggle from '@/src/components/ThemeToggle'
 
 interface HeaderProps {
     userProfile: {
-        username: string | null
+        nickname: string | null
         avatar_url: string | null
     } | null
 }
@@ -93,7 +93,7 @@ export default function Header({ userProfile }: HeaderProps) {
                             </Link>
                             <div className="flex items-center gap-3 bg-border px-3 py-1.5 rounded-full border border-gray-100">
                                 <span className="text-sm font-semibold text-main-text">
-                                    {userProfile.username || '사용자'}님
+                                    {userProfile.nickname || '사용자'}님
                                 </span>
                                 <button
                                     onClick={handleLogout}
