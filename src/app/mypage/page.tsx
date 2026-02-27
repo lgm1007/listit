@@ -104,6 +104,7 @@ export default function MyPage() {
 
         if (result.success) {
             alert('프로필이 성공적으로 업데이트되었습니다.')
+            router.refresh()
         } else {
             showError(result.message || '저장에 실패했습니다.', '저장 실패')
         }
