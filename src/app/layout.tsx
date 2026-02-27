@@ -27,7 +27,7 @@ export default async function RootLayout({
     // auth 정보가 있다면 profiles 테이블에서 닉네임 가져오기
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('username, avatar_url')
+      .select('nickname, avatar_url')
       .eq('id', user.id)
       .single()
 

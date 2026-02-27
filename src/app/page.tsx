@@ -25,7 +25,7 @@ export default async function Home({
       id,
       title,
       category,
-      profiles (username),
+      profiles (nickname),
       list_items (
         order_no,
         item_images (
@@ -109,7 +109,7 @@ export default async function Home({
                 {list.title}
               </h3>
               <p className="text-xs text-gray-400 mt-1">
-                by {profileData?.username || '익명'}
+                by {profileData?.nickname || '익명'}
               </p>
             </Link>
           )

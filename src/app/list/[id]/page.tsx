@@ -14,7 +14,7 @@ export default async function ListDetailPage({ params }: { params: { id: string 
         .from('lists')
         .select(`
           *,
-          profiles (username, avatar_url),
+          profiles (nickname, avatar_url),
           list_items (
             *,
             item_images (*) 
@@ -42,7 +42,7 @@ export default async function ListDetailPage({ params }: { params: { id: string 
                             <Image src={list.profiles.avatar_url} alt="avatar" fill className="object-cover" />
                         )}
                     </div>
-                    <span className="font-semibold text-sub-text">{list.profiles?.username}</span>
+                    <span className="font-semibold text-sub-text">{list.profiles?.nickname}</span>
                     <span className="text-gray-300">|</span>
                     <span className="text-sub-text">{new Date(list.created_at).toLocaleDateString()}</span>
                 </div>
