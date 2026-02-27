@@ -35,7 +35,7 @@ export default function CommentSection({ listId }: { listId: string }) {
 
         const { data } = await supabase
             .from('comments')
-            .select('*, profiles(username, avatar_url)')
+            .select('*, profiles(nickname, avatar_url)')
             .eq('list_id', listId)
             .order('created_at', { ascending: true })
         if (data) setComments(data)
@@ -129,7 +129,7 @@ export default function CommentSection({ listId }: { listId: string }) {
                             {comment.profiles?.avatar_url ? (
                                 <Image
                                     src={comment.profiles.avatar_url}
-                                    alt={`${comment.profiles.username}의 아바타`}
+                                    alt={`${comment.profiles.nickname}의 아바타`}
                                     fill
                                     className="object-cover"
                                     sizes="40px"
@@ -147,7 +147,7 @@ export default function CommentSection({ listId }: { listId: string }) {
                         <div className="flex-grow">
                             <div className="flex justify-between items-center mb-1">
                                 <div className="flex gap-2 items-center">
-                                    <span className="font-bold text-sm">{comment.profiles?.username}</span>
+                                    <span className="font-bold text-sm">{comment.profiles?.nickname}</span>
                                     <span className="text-[10px] text-gray-400">
                                         {new Date(comment.created_at).toLocaleDateString()}
                                     </span>
