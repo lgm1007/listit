@@ -14,8 +14,8 @@ export async function updateProfile(formData: FormData) {
 
     if (!user) return { success: false, message: '인증되지 않았습니다.' }
 
-    const nickname = formData.get('nickname') as string
-    const avatar_url = formData.get('avatar_url') as string
+    const nickname = String(formData.get('nickname') || '')
+    const avatar_url = String(formData.get('avatar_url') || '')
 
     const { error } = await supabase
         .from('profiles')
