@@ -7,7 +7,7 @@ import CommentSection from '@/src/components/list/CommentSection'
 import ImageSlider from '@/src/components/list/ImageSlider'
 
 export default async function ListDetailPage({ params }: { params: { id: string } }) {
-    const { id } = await params
+    const { id } = params
     const supabase = await createClient()
 
     // 1. 현재 로그인 유저 확인
