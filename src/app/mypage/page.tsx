@@ -9,6 +9,13 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ErrorModal from '@/src/components/ErrorModal'
 
+interface MyList {
+    id: string
+    title: string
+    category: string
+    created_at: string
+}
+
 export default function MyPage() {
     const router = useRouter()
     const supabase = createClient()
@@ -21,12 +28,6 @@ export default function MyPage() {
     const [loading, setLoading] = useState(true)           // 초기 데이터 로딩
 
     // 내가 작성한 리스트 목록
-    interface MyList {
-        id: string
-        title: string
-        category: string
-        created_at: string
-    }
     const [myLists, setMyLists] = useState<MyList[]>([])
 
     const [errorModal, setErrorModal] = useState({
