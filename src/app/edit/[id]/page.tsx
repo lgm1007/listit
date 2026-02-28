@@ -10,6 +10,20 @@ import { handleAuthError } from '@/utils/authErrorHandler'
 import { CATEGORY_NAMES } from '../../../constants/categories'
 import ErrorModal from '@/src/components/ErrorModal'
 
+interface ItemImage {
+    id: string
+    image_url: string
+    order_no: number
+}
+
+interface ListItem {
+    id: string
+    title: string
+    content: string
+    order_no: number
+    item_images: ItemImage[]
+}
+
 interface EditItemInput {
     title: string
     content: string
@@ -100,13 +114,13 @@ export default function EditPage() {
             setCategory(list.category)
 
             // 아이템 정렬 및 세팅
-            const sortedItems = [...list.list_items].sort((a: any, b: any) => a.order_no - b.order_no)
-            const editItems: EditItemInput[] = sortedItems.map((item: any) => {
-                const sortedImages = [...(item.item_images || [])].sort((a: any, b: any) => a.order_no - b.order_no)
+            const sortedItems = [...(list.list_items as ListItem[])].sort((a, b) => a.order_no - b.order_no)
+            const editItems: EditItemInput[] = sortedItems.map((item) => {
+                const sortedImages = [...(item.item_images || [])].sort((a, b) => a.order_no - b.order_no)
                 return {
                     title: item.title || '',
                     content: item.content || '',
-                    existingImageUrls: sortedImages.map((img: any) => img.image_url),
+                    existingImageUrls: sortedImages.map((img) => img.image_url),
                     newImages: [],
                     newPreviewUrls: [],
                 }
