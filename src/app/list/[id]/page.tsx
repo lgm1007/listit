@@ -1,15 +1,19 @@
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import LikeButton from '@/src/components/list/LikeButton'
 import CommentSection from '@/src/components/list/CommentSection'
 import ImageSlider from '@/src/components/list/ImageSlider'
 
 export default async function ListDetailPage({ params }: { params: { id: string } }) {
-    const { id } = await params
+    const { id } = params
     const supabase = await createClient()
 
-    // 1. 리스트 상세 데이터 가져오기 (Join 활용)
+    // 1. 현재 로그인 유저 확인
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // 2. 리스트 상세 데이터 가져오기 (Join 활용)
     const { data: list, error } = await supabase
         .from('lists')
         .select(`
@@ -25,12 +29,15 @@ export default async function ListDetailPage({ params }: { params: { id: string 
 
     if (error || !list) return notFound()
 
-    // 2. 아이템 정렬 (order_no 순)
+    // 3. 작성자 본인 여부 확인
+    const isOwner = user?.id === list.user_id
+
+    // 4. 아이템 정렬 (order_no 순)
     const sortedItems = [...list.list_items].sort((a, b) => a.order_no - b.order_no)
 
     return (
         <main className="max-w-3xl mx-auto px-6 py-12">
-            {/* 헤더 섹션 (기존과 동일) */}
+            {/* 헤더 섹션 */}
             <header className="mb-12 text-center">
                 <span className="inline-block px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-bold mb-4">
                     {list.category}
@@ -46,6 +53,16 @@ export default async function ListDetailPage({ params }: { params: { id: string 
                     <span className="text-gray-300">|</span>
                     <span className="text-sub-text">{new Date(list.created_at).toLocaleDateString()}</span>
                 </div>
+
+                {/* 작성자 본인인 경우 수정 버튼 표시 */}
+                {isOwner && (
+                    <Link
+                        href={`/edit/${id}`}
+                        className="inline-block mt-6 px-6 py-2 bg-main-bg border border-border text-sub-text rounded-full text-sm font-medium hover:border-sub-text transition"
+                    >
+                        ✏️ 수정하기
+                    </Link>
+                )}
             </header>
 
             {/* 리스트 아이템 섹션 */}

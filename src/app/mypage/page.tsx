@@ -6,7 +6,15 @@ import { uploadImage } from '@/utils/supabase/storage'
 import { compressImage } from '@/utils/imageControl'
 import { updateProfile } from './action'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import ErrorModal from '@/src/components/ErrorModal'
+
+interface MyList {
+    id: string
+    title: string
+    category: string
+    created_at: string
+}
 
 export default function MyPage() {
     const router = useRouter()
@@ -18,6 +26,9 @@ export default function MyPage() {
     const [isUploading, setIsUploading] = useState(false) // 이미지 업로드 상태
     const [isSaving, setIsSaving] = useState(false)       // DB 저장 상태
     const [loading, setLoading] = useState(true)           // 초기 데이터 로딩
+
+    // 내가 작성한 리스트 목록
+    const [myLists, setMyLists] = useState<MyList[]>([])
 
     const [errorModal, setErrorModal] = useState({
         isOpen: false,
@@ -51,6 +62,17 @@ export default function MyPage() {
             if (profile) {
                 setNickname(profile.nickname || '')
                 setAvatarUrl(profile.avatar_url || '')
+            }
+
+            // 내가 작성한 리스트 목록 조회
+            const { data: lists } = await supabase
+                .from('lists')
+                .select('id, title, category, created_at')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+
+            if (lists) {
+                setMyLists(lists)
             }
             setLoading(false)
         }
@@ -170,12 +192,37 @@ export default function MyPage() {
 
             <hr className="border-border" />
 
-            {/* 내가 쓴 글 목록 섹션 (추후 구현) */}
+            {/* 내가 쓴 글 목록 섹션 */}
             <section className="space-y-6">
                 <h3 className="text-xl font-bold text-main-text">내가 만든 리스트</h3>
-                <div className="text-center py-10 text-sub-text bg-card-bg rounded-2xl border border-dashed border-border">
-                    아직 작성한 리스트가 없습니다.
-                </div>
+                {myLists.length > 0 ? (
+                    <ul className="space-y-3">
+                        {myLists.map((list) => (
+                            <li key={list.id}>
+                                <Link
+                                    href={`/list/${list.id}`}
+                                    className="flex items-center justify-between p-4 bg-card-bg border border-border rounded-2xl hover:border-sub-text transition-all group"
+                                >
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <span className="px-2.5 py-0.5 bg-main-bg border border-border rounded-full text-xs font-medium text-sub-text shrink-0">
+                                            {list.category}
+                                        </span>
+                                        <span className="font-semibold text-main-text truncate group-hover:underline">
+                                            {list.title}
+                                        </span>
+                                    </div>
+                                    <span className="text-xs text-sub-text shrink-0 ml-4">
+                                        {new Date(list.created_at).toLocaleDateString()}
+                                    </span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <div className="text-center py-10 text-sub-text bg-card-bg rounded-2xl border border-dashed border-border">
+                        아직 작성한 리스트가 없습니다.
+                    </div>
+                )}
             </section>
 
             {/* 에러 모달 배치 */}
