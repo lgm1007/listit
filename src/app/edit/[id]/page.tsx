@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { uploadImage } from '@/utils/supabase/storage'
@@ -50,6 +50,10 @@ export default function EditPage() {
 
     // 2. 하위 리스트 아이템 상태
     const [items, setItems] = useState<EditItemInput[]>([])
+
+    // 최신 items를 항상 참조하기 위한 ref
+    const itemsRef = useRef(items)
+    itemsRef.current = items
 
     // 드래그 중인 아이템 인덱스 저장
     const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
@@ -233,9 +237,8 @@ export default function EditPage() {
      */
     useEffect(() => {
         return () => {
-            items.forEach(item => item.newPreviewUrls.forEach(url => URL.revokeObjectURL(url)))
+            itemsRef.current.forEach(item => item.newPreviewUrls.forEach(url => URL.revokeObjectURL(url)))
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     /**
