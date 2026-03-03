@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Share2, Link as LinkIcon, MessageCircle } from 'lucide-react' // 아이콘 라이브러리
 import ErrorModal from '../ErrorModal'
 
@@ -11,24 +11,11 @@ interface ShareButtonProps {
 }
 
 export default function ShareButton({ title, description, listId }: ShareButtonProps) {
-    const [isSdkReady, setIsSdkReady] = useState(false)
     const [errorModal, setErrorModal] = useState({
         isOpen: false,
         title: '',
         message: ''
     })
-
-    useEffect(() => {
-        // SDK가 로드될 때까지 반복 확인하거나, 이미 로드되었는지 체크
-        const checkKakao = setInterval(() => {
-            if (window.Kakao) {
-                setIsSdkReady(true)
-                clearInterval(checkKakao)
-            }
-        }, 500) // 0.5초마다 확인
-
-        return () => clearInterval(checkKakao)
-    }, [])
 
     const showError = (message: string, title: string = "알림") => {
         setErrorModal({
