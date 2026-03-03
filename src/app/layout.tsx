@@ -41,16 +41,14 @@ export default async function RootLayout({
 
   return (
     <html lang="ko" suppressHydrationWarning>
-      <head>
-        {/* 카카오 SDK 스크립트 추가 */}
-        <Script
-          src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.0/kakao.min.js"
-          integrity="sha384-lLeSetPsatB4S7M0m9E0YpT2h8V8X9f4J+"
-          crossOrigin="anonymous"
-          strategy="afterInteractive" // 페이지 로드 후 실행
-        />
-      </head>
       <body>
+        <head>
+          {/* 카카오 SDK 스크립트 추가 */}
+          <Script
+            src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.0/kakao.min.js"
+            strategy="afterInteractive" // 페이지 로드 후 실행
+          />
+        </head>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Header userProfile={userProfile} />
           {children}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Share2, Link as LinkIcon, MessageCircle } from 'lucide-react' // 아이콘 라이브러리
 import ErrorModal from '../ErrorModal'
 
@@ -11,11 +11,24 @@ interface ShareButtonProps {
 }
 
 export default function ShareButton({ title, description, listId }: ShareButtonProps) {
+    const [isSdkReady, setIsSdkReady] = useState(false)
     const [errorModal, setErrorModal] = useState({
         isOpen: false,
         title: '',
         message: ''
     })
+
+    useEffect(() => {
+        // SDK가 로드될 때까지 반복 확인하거나, 이미 로드되었는지 체크
+        const checkKakao = setInterval(() => {
+            if (window.Kakao) {
+                setIsSdkReady(true)
+                clearInterval(checkKakao)
+            }
+        }, 500) // 0.5초마다 확인
+
+        return () => clearInterval(checkKakao)
+    }, [])
 
     const showError = (message: string, title: string = "알림") => {
         setErrorModal({
@@ -66,29 +79,29 @@ export default function ShareButton({ title, description, listId }: ShareButtonP
 
     // 3. 카카오톡 공유 (SDK 필요)
     const handleKakaoShare = () => {
-        const { Kakao } = window as any
+        const kakao = window.Kakao
         const shareUrl = getShareUrl()
 
-        if (!Kakao) {
+        if (!kakao) {
             showError('카카오 SDK가 로드되지 않았습니다.', '공유 오류')
             return
         }
 
-        if (!Kakao.isInitialized()) {
+        if (!kakao.isInitialized()) {
             const apiKey = process.env.NEXT_PUBLIC_KAKAO_API_KEY
             if (!apiKey) {
                 showError('카카오 API 키가 설정되지 않았습니다.', '설정 오류')
                 return
             }
-            Kakao.init(apiKey)
+            kakao.init(apiKey)
         }
 
-        Kakao.Share.sendDefault({
+        kakao.Share.sendDefault({
             objectType: 'feed',
             content: {
                 title: title,
                 description: description || '리스팃에서 확인해보세요!',
-                imageUrl: '${window.location.origin}/logo.png', // 보통 로고나 리스트 첫번째 이미지
+                imageUrl: `${window.location.origin}/logo.png`, // 보통 로고나 리스트 첫번째 이미지
                 link: {
                     mobileWebUrl: shareUrl,
                     webUrl: shareUrl,
