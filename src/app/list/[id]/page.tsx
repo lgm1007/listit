@@ -93,14 +93,14 @@ export default async function ListDetailPage({ params }: { params: { id: string 
             </section>
 
             <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">{list.title}</h2>
                 <ShareButton
                     title={list.title}
-                    description="내가 만든 멋진 리스트를 확인해보세요!"
+                    description="내가 만든 리스트를 공유해보세요"
                     listId={id}
                 />
             </div>
 
+            <br />
             <hr className="border-border mb-10" />
 
             <section className="flex flex-col items-center gap-8 mb-20">
