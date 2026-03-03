@@ -40,6 +40,8 @@ export default async function RootLayout({
 
   return (
     <html lang="ko" suppressHydrationWarning>
+      {/* 카카오 SDK 추가 */}
+      <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.0/kakao.min.js" integrity="sha384-lLeSetPsatB4S7M0m9E0YpT2h8V8X9f4J+" crossOrigin="anonymous"></script>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Header userProfile={userProfile} />
