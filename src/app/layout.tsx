@@ -2,6 +2,7 @@ import Header from '@/src/components/layout/Header'
 import { createClient } from '@/utils/supabase/server'
 import './globals.css'
 import { ThemeProvider } from '@/src/components/ThemeProvider'
+import Script from 'next/script'
 
 /**
  * 루트 레이아웃 컴포넌트
@@ -40,8 +41,15 @@ export default async function RootLayout({
 
   return (
     <html lang="ko" suppressHydrationWarning>
-      {/* 카카오 SDK 추가 */}
-      <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.0/kakao.min.js" integrity="sha384-lLeSetPsatB4S7M0m9E0YpT2h8V8X9f4J+" crossOrigin="anonymous"></script>
+      <head>
+        {/* 카카오 SDK 스크립트 추가 */}
+        <Script
+          src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.0/kakao.min.js"
+          integrity="sha384-lLeSetPsatB4S7M0m9E0YpT2h8V8X9f4J+"
+          crossOrigin="anonymous"
+          strategy="afterInteractive" // 페이지 로드 후 실행
+        />
+      </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Header userProfile={userProfile} />

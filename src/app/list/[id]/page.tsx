@@ -4,10 +4,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import LikeButton from '@/src/components/list/LikeButton'
 import CommentSection from '@/src/components/list/CommentSection'
+import ShareButton from '@/src/components/list/ShareButton'
 import ImageSlider from '@/src/components/list/ImageSlider'
 
 export default async function ListDetailPage({ params }: { params: { id: string } }) {
-    const { id } = params
+    const { id } = await params
     const supabase = await createClient()
 
     // 1. 현재 로그인 유저 확인
@@ -90,6 +91,15 @@ export default async function ListDetailPage({ params }: { params: { id: string 
                     )
                 })}
             </section>
+
+            <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">{list.title}</h2>
+                <ShareButton
+                    title={list.title}
+                    description="내가 만든 멋진 리스트를 확인해보세요!"
+                    listId={id}
+                />
+            </div>
 
             <hr className="border-border mb-10" />
 
