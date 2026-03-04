@@ -148,13 +148,15 @@ export default function AdminReportPage() {
                                     <td className="p-4 flex gap-2">
                                         <button
                                             onClick={() => handleRestore(report.id, report.target_type, report.target_id)}
-                                            className="p-2 hover:bg-gray-200 rounded-lg title='복구' cursor-pointer"
+                                            className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer"
+                                            title='복구'
                                         >
                                             <RotateCcw size={18} className="text-blue-500" />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(report.id, report.target_type, report.target_id, report.target_user_id)} // target_user_id는 report 생성 시 기록해두면 편합니다
-                                            className="p-2 hover:bg-gray-200 rounded-lg title='삭제' cursor-pointer"
+                                            className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer"
+                                            title='삭제'
                                         >
                                             <Trash2 size={18} className="text-red-500" />
                                         </button>
