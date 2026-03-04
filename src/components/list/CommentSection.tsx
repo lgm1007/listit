@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { handleAuthError } from '@/utils/authErrorHandler'
 import AuthModal from '@/src/components/AuthModal'
+import ReportButton from '@/src/components/list/ReportButton'
 
 export default function CommentSection({ listId }: { listId: string }) {
     const supabase = createClient()
@@ -37,6 +38,7 @@ export default function CommentSection({ listId }: { listId: string }) {
             .from('comments')
             .select('*, profiles(nickname, avatar_url)')
             .eq('list_id', listId)
+            .eq('is_hidden', false) // 숨겨진 코멘트는 노출되지 않음
             .order('created_at', { ascending: true })
         if (data) setComments(data)
     }
@@ -152,6 +154,11 @@ export default function CommentSection({ listId }: { listId: string }) {
                                         {new Date(comment.created_at).toLocaleDateString()}
                                     </span>
                                 </div>
+
+                                {/* 신고 버튼 */}
+                                {currentUserId !== comment.user_id && (
+                                    <ReportButton targetType="comment" targetId={comment.id} />
+                                )}
 
                                 {/* 본인 댓글일 때 & 수정 중이 아닐 때만 수정/삭제 버튼 노출 */}
                                 {currentUserId === comment.user_id && editingId !== comment.id && (

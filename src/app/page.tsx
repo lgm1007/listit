@@ -34,6 +34,7 @@ export default async function Home({
         )
       )
     `)
+    .eq('is_hidden', false) // 숨김 처리된 리스트는 노출하지 않음
     .order('created_at', { ascending: false })
 
   // 2. 검색어 필터링 (TODO: 나중에 OpenSearch로 확장 가능)
