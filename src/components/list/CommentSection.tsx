@@ -36,7 +36,7 @@ export default function CommentSection({ listId }: { listId: string }) {
 
         const { data } = await supabase
             .from('comments')
-            .select('*, profiles(nickname, avatar_url)')
+            .select('*, profiles(id, nickname, avatar_url)')
             .eq('list_id', listId)
             .eq('is_hidden', false) // 숨겨진 코멘트는 노출되지 않음
             .order('created_at', { ascending: true })
@@ -131,7 +131,7 @@ export default function CommentSection({ listId }: { listId: string }) {
                             {comment.profiles?.avatar_url ? (
                                 <Image
                                     src={comment.profiles.avatar_url}
-                                    alt={`${comment.profiles.nickname}의 아바타`}
+                                    alt={`${comment.profiles?.nickname || '사용자'}의 아바타`}
                                     fill
                                     className="object-cover"
                                     sizes="40px"
@@ -149,7 +149,7 @@ export default function CommentSection({ listId }: { listId: string }) {
                         <div className="flex-grow">
                             <div className="flex justify-between items-center mb-1">
                                 <div className="flex gap-2 items-center">
-                                    <span className="font-bold text-sm">{comment.profiles?.nickname}</span>
+                                    <span className="font-bold text-sm">{comment.profiles?.nickname || '사용자'}</span>
                                     <span className="text-[10px] text-gray-400">
                                         {new Date(comment.created_at).toLocaleDateString()}
                                     </span>
@@ -157,7 +157,7 @@ export default function CommentSection({ listId }: { listId: string }) {
 
                                 {/* 신고 버튼 */}
                                 {currentUserId !== comment.user_id && (
-                                    <ReportButton targetType="comment" targetId={comment.id} />
+                                    <ReportButton targetType="comment" targetId={comment.id} targetUserId={comment.profiles?.id || ''} />
                                 )}
 
                                 {/* 본인 댓글일 때 & 수정 중이 아닐 때만 수정/삭제 버튼 노출 */}

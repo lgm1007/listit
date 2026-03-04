@@ -20,7 +20,7 @@ export default async function ListDetailPage({ params }: { params: { id: string 
         .from('lists')
         .select(`
           *,
-          profiles (nickname, avatar_url),
+          profiles (id, nickname, avatar_url),
           list_items (
             *,
             item_images (*) 
@@ -99,7 +99,7 @@ export default async function ListDetailPage({ params }: { params: { id: string 
                     description="내가 만든 리스트를 공유해보세요"
                     listId={id}
                 />
-                <ReportButton targetType="list" targetId={id} />
+                <ReportButton targetType="list" targetId={id} targetUserId={list.profiles?.id || ''} />
             </div>
 
             <br />
