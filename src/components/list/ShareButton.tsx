@@ -119,13 +119,13 @@ export default function ShareButton({ title, description, listId }: ShareButtonP
                 </button>
 
                 {/* 카카오톡 공유 버튼 */}
-                <button
+                {/* <button
                     onClick={handleKakaoShare}
                     className="p-2 rounded-full bg-[#FEE500] text-[#191919] hover:opacity-90 transition cursor-pointer"
                     title="카카오톡 공유"
                 >
                     <MessageCircle size={20} fill="currentColor" />
-                </button>
+                </button> */}
 
                 {/* 링크 복사 버튼 */}
                 <button
