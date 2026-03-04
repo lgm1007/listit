@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { AlertTriangle } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import ErrorModal from '../ErrorModal'
@@ -12,6 +13,7 @@ interface ReportButtonProps {
 
 export default function ReportButton({ targetType, targetId }: ReportButtonProps) {
     const supabase = createClient()
+    const router = useRouter()
     const [errorModal, setErrorModal] = useState({
         isOpen: false,
         title: '',
@@ -54,7 +56,7 @@ export default function ReportButton({ targetType, targetId }: ReportButtonProps
             if (hideError) throw hideError
 
             alert('신고가 접수되어 해당 콘텐츠가 숨김 처리되었습니다. 관리자 검토 후 조치될 예정입니다.')
-            window.location.reload() // UI 갱신을 위해 새로고침
+            router.refresh() // UI 갱신을 위해 새로고침
 
         } catch (error) {
             console.error('Report error:', error)
