@@ -1,13 +1,59 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { Trash2, RotateCcw, AlertCircle } from 'lucide-react'
+import ErrorModal from '@/src/components/ErrorModal'
 
 export default function AdminReportPage() {
     const supabase = createClient()
+    const router = useRouter()
+    const [errorModal, setErrorModal] = useState({
+        isOpen: false,
+        title: '',
+        message: ''
+    })
+
     const [reports, setReports] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const [isAdmin, setIsAdmin] = useState<boolean | null>(null) // 관리자 여부 상태
+
+    const showError = (message: string, title: string = "알림") => {
+        setErrorModal({
+            isOpen: true,
+            title,
+            message
+        })
+    }
+
+    /**
+     * 관리자 확인
+     */
+    const checkAdmin = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+
+        if (!user) {
+            showError('로그인이 필요합니다.', '로그인 상태 에러')
+            router.push('/')
+            return
+        }
+
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single()
+
+        if (!profile?.is_admin) {
+            showError('관리자 권한이 없습니다.', '권한 에러')
+            router.push('/') // 권한 없으면 메인으로
+            return
+        }
+
+        setIsAdmin(true)
+        fetchReports() // 관리자 확인 후 데이터 로드
+    }
 
     const fetchReports = async () => {
         setLoading(true)
@@ -25,7 +71,9 @@ export default function AdminReportPage() {
         setLoading(false)
     }
 
-    useEffect(() => { fetchReports() }, [])
+    useEffect(() => {
+        checkAdmin()
+    }, [])
 
     // 복구 로직
     const handleRestore = async (reportId: string, targetType: string, targetId: string) => {
@@ -65,54 +113,65 @@ export default function AdminReportPage() {
         fetchReports()
     }
 
-    if (loading) return <div className="p-10 text-center">불러오는 중...</div>
+    // 로딩 중이거나 권한 확인 전일 때
+    if (isAdmin === null || loading) {
+        return <div className="p-20 text-center font-medium">권한 확인 및 데이터 로딩 중...</div>
+    }
 
     return (
-        <div className="max-w-5xl mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
-                <AlertCircle className="text-red-500" /> 신고 관리 시스템
-            </h1>
+        <>
+            <div className="max-w-5xl mx-auto p-6">
+                <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
+                    <AlertCircle className="text-red-500" /> 신고 관리 시스템
+                </h1>
 
-            <div className="bg-white dark:bg-zinc-900 border border-border rounded-xl overflow-hidden">
-                <table className="w-full text-left border-collapse">
-                    <thead className="bg-card-bg text-sm">
-                        <tr>
-                            <th className="p-4">유형</th>
-                            <th className="p-4">신고 사유</th>
-                            <th className="p-4">신고자</th>
-                            <th className="p-4">관리</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                        {reports.map((report) => (
-                            <tr key={report.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/50 transition">
-                                <td className="p-4">
-                                    <span className={`px-2 py-1 rounded text-xs font-bold ${report.target_type === 'list' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
-                                        {report.target_type.toUpperCase()}
-                                    </span>
-                                </td>
-                                <td className="p-4 text-sm text-gray-500">{report.reason}</td>
-                                <td className="p-4 text-sm text-gray-500">{report.reporter?.nickname || '알 수 없음'}</td>
-                                <td className="p-4 flex gap-2">
-                                    <button
-                                        onClick={() => handleRestore(report.id, report.target_type, report.target_id)}
-                                        className="p-2 hover:bg-gray-200 rounded-lg title='복구' cursor-pointer"
-                                    >
-                                        <RotateCcw size={18} className="text-blue-500" />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(report.id, report.target_type, report.target_id, report.target_user_id)} // target_user_id는 report 생성 시 기록해두면 편합니다
-                                        className="p-2 hover:bg-gray-200 rounded-lg title='삭제' cursor-pointer"
-                                    >
-                                        <Trash2 size={18} className="text-red-500" />
-                                    </button>
-                                </td>
+                <div className="bg-white dark:bg-zinc-900 border border-border rounded-xl overflow-hidden">
+                    <table className="w-full text-left border-collapse">
+                        <thead className="bg-card-bg text-sm">
+                            <tr>
+                                <th className="p-4">유형</th>
+                                <th className="p-4">신고 사유</th>
+                                <th className="p-4">신고자</th>
+                                <th className="p-4">관리</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {reports.length === 0 && <div className="p-20 text-center text-gray-400">신고된 내역이 없습니다.</div>}
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                            {reports.map((report) => (
+                                <tr key={report.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/50 transition">
+                                    <td className="p-4">
+                                        <span className={`px-2 py-1 rounded text-xs font-bold ${report.target_type === 'list' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                                            {report.target_type.toUpperCase()}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 text-sm text-gray-500">{report.reason}</td>
+                                    <td className="p-4 text-sm text-gray-500">{report.reporter?.nickname || '알 수 없음'}</td>
+                                    <td className="p-4 flex gap-2">
+                                        <button
+                                            onClick={() => handleRestore(report.id, report.target_type, report.target_id)}
+                                            className="p-2 hover:bg-gray-200 rounded-lg title='복구' cursor-pointer"
+                                        >
+                                            <RotateCcw size={18} className="text-blue-500" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(report.id, report.target_type, report.target_id, report.target_user_id)} // target_user_id는 report 생성 시 기록해두면 편합니다
+                                            className="p-2 hover:bg-gray-200 rounded-lg title='삭제' cursor-pointer"
+                                        >
+                                            <Trash2 size={18} className="text-red-500" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    {reports.length === 0 && <div className="p-20 text-center text-gray-400">신고된 내역이 없습니다.</div>}
+                </div>
             </div>
-        </div>
+            <ErrorModal
+                isOpen={errorModal.isOpen}
+                title={errorModal.title}
+                message={errorModal.message}
+                onClose={() => setErrorModal({ isOpen: false, title: '', message: '' })}
+            />
+        </>
     )
 }
