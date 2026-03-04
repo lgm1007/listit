@@ -69,7 +69,7 @@ export default function AdminReportPage() {
     const fetchReports = async () => {
         setLoading(true)
         // 신고 내역과 함께 해당 타겟의 정보를 조인해서 가져옵니다.
-        const { data } = await supabase
+        const { data, error } = await supabase
             .from('reports')
             .select(`
                 *,
@@ -78,7 +78,12 @@ export default function AdminReportPage() {
             .eq('status', 'pending')
             .order('created_at', { ascending: false })
 
-        if (data) setReports(data)
+        if (error) {
+            showError('신고 내역 조회 중 오류가 발생했습니다.', '조회 에러')
+        } else if (data) {
+            setReports(data)
+        }
+
         setLoading(false)
     }
 
