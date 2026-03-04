@@ -6,6 +6,17 @@ import { createClient } from '@/utils/supabase/client'
 import { Trash2, RotateCcw, AlertCircle } from 'lucide-react'
 import ErrorModal from '@/src/components/ErrorModal'
 
+interface Report {
+    id: string;
+    created_at: string;
+    target_type: 'list' | 'comment';
+    target_id: string;
+    target_user_id: string;
+    reason: string;
+    status: 'pending' | 'reviewed';
+    reporter: { nickname: string } | null;
+}
+
 export default function AdminReportPage() {
     const supabase = createClient()
     const router = useRouter()
@@ -15,7 +26,7 @@ export default function AdminReportPage() {
         message: ''
     })
 
-    const [reports, setReports] = useState<any[]>([])
+    const [reports, setReports] = useState<Report[]>([])
     const [loading, setLoading] = useState(true)
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null) // 관리자 여부 상태
 
