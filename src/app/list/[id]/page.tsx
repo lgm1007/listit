@@ -5,6 +5,7 @@ import Link from 'next/link'
 import LikeButton from '@/src/components/list/LikeButton'
 import CommentSection from '@/src/components/list/CommentSection'
 import ShareButton from '@/src/components/list/ShareButton'
+import ReportButton from '@/src/components/list/ReportButton'
 import ImageSlider from '@/src/components/list/ImageSlider'
 
 export default async function ListDetailPage({ params }: { params: { id: string } }) {
@@ -98,6 +99,7 @@ export default async function ListDetailPage({ params }: { params: { id: string 
                     description="내가 만든 리스트를 공유해보세요"
                     listId={id}
                 />
+                <ReportButton targetType="list" targetId={id} />
             </div>
 
             <br />
