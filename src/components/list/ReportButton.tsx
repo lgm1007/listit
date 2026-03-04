@@ -9,9 +9,10 @@ import ErrorModal from '../ErrorModal'
 interface ReportButtonProps {
     targetType: 'list' | 'comment'
     targetId: string
+    targetUserId: string
 }
 
-export default function ReportButton({ targetType, targetId }: ReportButtonProps) {
+export default function ReportButton({ targetType, targetId, targetUserId }: ReportButtonProps) {
     const supabase = createClient()
     const router = useRouter()
     const [errorModal, setErrorModal] = useState({
@@ -29,6 +30,13 @@ export default function ReportButton({ targetType, targetId }: ReportButtonProps
     }
 
     const handleReport = async () => {
+        // 0. 로그인 세션 확인
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            showError('로그인 후 이용 가능합니다.', '로그인 필요')
+            return
+        }
+
         const reason = prompt('신고 사유를 입력해주세요 (부적절한 콘텐츠, 욕설 등):')
         if (!reason) return
 
@@ -41,7 +49,9 @@ export default function ReportButton({ targetType, targetId }: ReportButtonProps
                 .insert({
                     target_type: targetType,
                     target_id: targetId,
-                    reason: reason
+                    reason: reason,
+                    reporter_id: user.id, // 신고자 사용자 ID
+                    target_user_id: targetUserId // 신고 대상 게시물 작성한 사용자 ID
                 })
 
             if (reportError) throw reportError
