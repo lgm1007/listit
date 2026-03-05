@@ -2,9 +2,20 @@ import type { OpenNextConfig } from "@opennextjs/cloudflare";
 
 const config: OpenNextConfig = {
     default: {
-        runtime: "edge",
+        override: {
+            wrapper: "cloudflare-node",
+            converter: "edge",
+            proxyExternalRequest: "fetch",
+        },
     },
-    // 필요한 경우 특정 경로에 대한 설정을 추가할 수 있습니다.
+    middleware: {
+        external: true,
+        override: {
+            wrapper: "cloudflare-edge",
+            converter: "edge",
+            proxyExternalRequest: "fetch",
+        },
+    },
 };
 
 export default config;
