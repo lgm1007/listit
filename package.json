@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "build:cf": "npx @opennextjs/cloudflare"
+    "build:cf": "npx @opennextjs/cloudflare",
+    "deploy": "npm run build:cf && npx wrangler deploy"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
