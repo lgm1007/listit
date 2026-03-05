@@ -1,6 +1,7 @@
 # 📝 리스팃 (Listit)
 
 ## 프로젝트 개요
+- [서비스 접속 링크](https://listit.ourz.workers.dev)
 - 웹 기반 주제별 리스트 공유 플랫폼
 - 바이브코딩으로 실제 사용자가 이용할 수 있는 수준의 프로젝트를 만들어보는 프로젝트
 
@@ -15,7 +16,7 @@
 - Tailwind CSS
 - Supabase
 - Supabase Storage
-- Vercel
+- Cloudflare Workers
 
 ## 설치 및 실행
 ```
