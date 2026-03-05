@@ -1,4 +1,4 @@
-name = "list-it"
+name = "listit"
 main = ".open-next/worker.js"
 compatibility_date = "2026-03-05"
 compatibility_flags = ["nodejs_compat"]
