@@ -6,15 +6,9 @@ import { uploadImage } from '@/utils/supabase/storage'
 import { compressImage } from '@/utils/imageControl'
 import { updateProfile } from './action'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import ErrorModal from '@/src/components/ErrorModal'
-
-interface MyList {
-    id: string
-    title: string
-    category: string
-    created_at: string
-}
+import ListSection from '@/src/components/mypage/ListSection'
+import { List } from '@/src/types/list'
 
 export default function MyPage() {
     const router = useRouter()
@@ -28,10 +22,13 @@ export default function MyPage() {
     const [loading, setLoading] = useState(true)           // 초기 데이터 로딩
 
     // 내가 작성한 리스트 목록
-    const [myLists, setMyLists] = useState<MyList[]>([])
+    const [myLists, setMyLists] = useState<List[]>([])
 
     // 내가 좋아요한 리스트 목록
-    const [likedLists, setLikedLists] = useState<MyList[]>([])
+    const [likedLists, setLikedLists] = useState<List[]>([])
+
+    // 탭 상태
+    const [activeTab, setActiveTab] = useState<'my' | 'liked'>('my')
 
     const [errorModal, setErrorModal] = useState({
         isOpen: false,
@@ -83,10 +80,11 @@ export default function MyPage() {
                 .from('likes')
                 .select('lists (id, title, category, created_at)')
                 .eq('user_id', user.id)
+                .order('created_at', { referencedTable: 'lists', ascending: false })
 
             if (likes) {
                 const parsed = likes
-                    .map((like: { lists: MyList | null }) => like.lists)
+                    .map((like: { lists: List | null }) => like.lists)
                     .filter(Boolean)
                 setLikedLists(parsed)
             }
@@ -208,73 +206,37 @@ export default function MyPage() {
 
             <hr className="border-border" />
 
-            {/* 내가 쓴 글 목록 섹션 */}
-            <section className="space-y-6">
-                <h3 className="text-xl font-bold text-main-text">내가 만든 리스트</h3>
-                {myLists.length > 0 ? (
-                    <ul className="space-y-3">
-                        {myLists.map((list) => (
-                            <li key={list.id}>
-                                <Link
-                                    href={`/list/${list.id}`}
-                                    className="flex items-center justify-between p-4 bg-card-bg border border-border rounded-2xl hover:border-sub-text transition-all group"
-                                >
-                                    <div className="flex items-center gap-3 min-w-0">
-                                        <span className="px-2.5 py-0.5 bg-main-bg border border-border rounded-full text-xs font-medium text-sub-text shrink-0">
-                                            {list.category}
-                                        </span>
-                                        <span className="font-semibold text-main-text truncate group-hover:underline">
-                                            {list.title}
-                                        </span>
-                                    </div>
-                                    <span className="text-xs text-sub-text shrink-0 ml-4">
-                                        {new Date(list.created_at).toLocaleDateString()}
-                                    </span>
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <div className="text-center py-10 text-sub-text bg-card-bg rounded-2xl border border-dashed border-border">
-                        아직 작성한 리스트가 없습니다.
-                    </div>
-                )}
-            </section>
+            {/* 탭 UI */}
+            <div className="flex gap-2">
+                {([
+                    { id: 'my', label: '✏️ 내가 만든 리스트' },
+                    { id: 'liked', label: '❤️ 좋아요한 리스트' },
+                ] as const).map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex-1 py-3 rounded-2xl text-sm font-bold transition cursor-pointer ${activeTab === tab.id
+                            ? 'bg-main-text text-main-bg'
+                            : 'bg-card-bg text-sub-text border border-border hover:border-sub-text'
+                            }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
 
-            <hr className="border-border" />
-
-            {/* 좋아요한 리스트 목록 섹션 */}
-            <section className="space-y-6">
-                <h3 className="text-xl font-bold text-main-text">❤️ 좋아요한 리스트</h3>
-                {likedLists.length > 0 ? (
-                    <ul className="space-y-3">
-                        {likedLists.map((list) => (
-                            <li key={list.id}>
-                                <Link
-                                    href={`/list/${list.id}`}
-                                    className="flex items-center justify-between p-4 bg-card-bg border border-border rounded-2xl hover:border-sub-text transition-all group"
-                                >
-                                    <div className="flex items-center gap-3 min-w-0">
-                                        <span className="px-2.5 py-0.5 bg-main-bg border border-border rounded-full text-xs font-medium text-sub-text shrink-0">
-                                            {list.category}
-                                        </span>
-                                        <span className="font-semibold text-main-text truncate group-hover:underline">
-                                            {list.title}
-                                        </span>
-                                    </div>
-                                    <span className="text-xs text-sub-text shrink-0 ml-4">
-                                        {new Date(list.created_at).toLocaleDateString()}
-                                    </span>
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <div className="text-center py-10 text-sub-text bg-card-bg rounded-2xl border border-dashed border-border">
-                        아직 좋아요한 리스트가 없습니다.
-                    </div>
-                )}
-            </section>
+            {/* 탭 콘텐츠 */}
+            {activeTab === 'my' ? (
+                <ListSection
+                    lists={myLists}
+                    emptyMessage="아직 작성한 리스트가 없습니다."
+                />
+            ) : (
+                <ListSection
+                    lists={likedLists}
+                    emptyMessage="아직 좋아요한 리스트가 없습니다."
+                />
+            )}
 
             {/* 에러 모달 배치 */}
             <ErrorModal
