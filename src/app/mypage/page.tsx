@@ -86,7 +86,7 @@ export default function MyPage() {
 
             if (likes) {
                 const parsed = likes
-                    .map((like: any) => like.lists)
+                    .map((like: { lists: MyList | null }) => like.lists)
                     .filter(Boolean)
                 setLikedLists(parsed)
             }
