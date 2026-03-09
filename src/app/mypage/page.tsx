@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 import ErrorModal from '@/src/components/ErrorModal'
 import ListSection from '@/src/components/mypage/ListSection'
 
-interface MyList {
+interface List {
     id: string
     title: string
     category: string
@@ -28,10 +28,10 @@ export default function MyPage() {
     const [loading, setLoading] = useState(true)           // 초기 데이터 로딩
 
     // 내가 작성한 리스트 목록
-    const [myLists, setMyLists] = useState<MyList[]>([])
+    const [myLists, setMyLists] = useState<List[]>([])
 
     // 내가 좋아요한 리스트 목록
-    const [likedLists, setLikedLists] = useState<MyList[]>([])
+    const [likedLists, setLikedLists] = useState<List[]>([])
 
     // 탭 상태
     const [activeTab, setActiveTab] = useState<'my' | 'liked'>('my')
@@ -86,10 +86,11 @@ export default function MyPage() {
                 .from('likes')
                 .select('lists (id, title, category, created_at)')
                 .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
 
             if (likes) {
                 const parsed = likes
-                    .map((like: { lists: MyList | null }) => like.lists)
+                    .map((like: { lists: List | null }) => like.lists)
                     .filter(Boolean)
                 setLikedLists(parsed)
             }
