@@ -8,13 +8,7 @@ import { updateProfile } from './action'
 import { useRouter } from 'next/navigation'
 import ErrorModal from '@/src/components/ErrorModal'
 import ListSection from '@/src/components/mypage/ListSection'
-
-interface List {
-    id: string
-    title: string
-    category: string
-    created_at: string
-}
+import { List } from '@/src/types/list'
 
 export default function MyPage() {
     const router = useRouter()

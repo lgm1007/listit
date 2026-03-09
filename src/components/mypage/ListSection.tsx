@@ -1,14 +1,8 @@
 import Link from 'next/link'
-
-interface ListItem {
-    id: string
-    title: string
-    category: string
-    created_at: string
-}
+import { List } from '@/src/types/list'
 
 interface ListSectionProps {
-    lists: ListItem[]
+    lists: List[]
     emptyMessage: string
 }
 
