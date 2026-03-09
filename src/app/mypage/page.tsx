@@ -214,24 +214,21 @@ export default function MyPage() {
 
             {/* 탭 UI */}
             <div className="flex gap-2">
-                <button
-                    onClick={() => setActiveTab('my')}
-                    className={`flex-1 py-3 rounded-2xl text-sm font-bold transition cursor-pointer ${activeTab === 'my'
-                        ? 'bg-main-text text-main-bg'
-                        : 'bg-card-bg text-sub-text border border-border hover:border-sub-text'
-                        }`}
-                >
-                    ✏️ 내가 만든 리스트
-                </button>
-                <button
-                    onClick={() => setActiveTab('liked')}
-                    className={`flex-1 py-3 rounded-2xl text-sm font-bold transition cursor-pointer ${activeTab === 'liked'
-                        ? 'bg-main-text text-main-bg'
-                        : 'bg-card-bg text-sub-text border border-border hover:border-sub-text'
-                        }`}
-                >
-                    ❤️ 좋아요한 리스트
-                </button>
+                {([
+                    { id: 'my', label: '✏️ 내가 만든 리스트' },
+                    { id: 'liked', label: '❤️ 좋아요한 리스트' },
+                ] as const).map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex-1 py-3 rounded-2xl text-sm font-bold transition cursor-pointer ${activeTab === tab.id
+                            ? 'bg-main-text text-main-bg'
+                            : 'bg-card-bg text-sub-text border border-border hover:border-sub-text'
+                            }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
             </div>
 
             {/* 탭 콘텐츠 */}
