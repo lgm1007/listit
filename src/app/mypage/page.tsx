@@ -30,6 +30,9 @@ export default function MyPage() {
     // 내가 작성한 리스트 목록
     const [myLists, setMyLists] = useState<MyList[]>([])
 
+    // 내가 좋아요한 리스트 목록
+    const [likedLists, setLikedLists] = useState<MyList[]>([])
+
     const [errorModal, setErrorModal] = useState({
         isOpen: false,
         title: '',
@@ -73,6 +76,19 @@ export default function MyPage() {
 
             if (lists) {
                 setMyLists(lists)
+            }
+
+            // 내가 좋아요한 리스트 목록 조회
+            const { data: likes } = await supabase
+                .from('likes')
+                .select('lists (id, title, category, created_at)')
+                .eq('user_id', user.id)
+
+            if (likes) {
+                const parsed = likes
+                    .map((like: any) => like.lists)
+                    .filter(Boolean)
+                setLikedLists(parsed)
             }
             setLoading(false)
         }
@@ -221,6 +237,41 @@ export default function MyPage() {
                 ) : (
                     <div className="text-center py-10 text-sub-text bg-card-bg rounded-2xl border border-dashed border-border">
                         아직 작성한 리스트가 없습니다.
+                    </div>
+                )}
+            </section>
+
+            <hr className="border-border" />
+
+            {/* 좋아요한 리스트 목록 섹션 */}
+            <section className="space-y-6">
+                <h3 className="text-xl font-bold text-main-text">❤️ 좋아요한 리스트</h3>
+                {likedLists.length > 0 ? (
+                    <ul className="space-y-3">
+                        {likedLists.map((list) => (
+                            <li key={list.id}>
+                                <Link
+                                    href={`/list/${list.id}`}
+                                    className="flex items-center justify-between p-4 bg-card-bg border border-border rounded-2xl hover:border-sub-text transition-all group"
+                                >
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <span className="px-2.5 py-0.5 bg-main-bg border border-border rounded-full text-xs font-medium text-sub-text shrink-0">
+                                            {list.category}
+                                        </span>
+                                        <span className="font-semibold text-main-text truncate group-hover:underline">
+                                            {list.title}
+                                        </span>
+                                    </div>
+                                    <span className="text-xs text-sub-text shrink-0 ml-4">
+                                        {new Date(list.created_at).toLocaleDateString()}
+                                    </span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <div className="text-center py-10 text-sub-text bg-card-bg rounded-2xl border border-dashed border-border">
+                        아직 좋아요한 리스트가 없습니다.
                     </div>
                 )}
             </section>
