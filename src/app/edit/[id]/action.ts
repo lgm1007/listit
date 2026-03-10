@@ -1,13 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-
-interface ItemData {
-    title: string
-    content: string
-    image_urls: string[]
-    order_no: number
-}
+import { ItemData } from '@/src/types/list'
 
 /**
  * 리스트 메인 정보와 하위 아이템들을 업데이트

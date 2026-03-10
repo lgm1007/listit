@@ -9,3 +9,11 @@ export interface List {
     category: string
     created_at: string
 }
+
+/** 서버 액션에 전달되는 아이템 데이터 */
+export interface ItemData {
+    title: string
+    content: string
+    image_urls: string[]
+    order_no: number
+}

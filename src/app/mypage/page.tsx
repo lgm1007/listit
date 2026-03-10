@@ -7,6 +7,7 @@ import { compressImage } from '@/utils/imageControl'
 import { updateProfile } from './action'
 import { useRouter } from 'next/navigation'
 import ErrorModal from '@/src/components/ErrorModal'
+import { useErrorModal } from '@/src/hooks/useErrorModal'
 import ListSection from '@/src/components/mypage/ListSection'
 import { List } from '@/src/types/list'
 
@@ -30,19 +31,7 @@ export default function MyPage() {
     // 탭 상태
     const [activeTab, setActiveTab] = useState<'my' | 'liked'>('my')
 
-    const [errorModal, setErrorModal] = useState({
-        isOpen: false,
-        title: '',
-        message: ''
-    })
-
-    const showError = (message: string, title: string = "알림") => {
-        setErrorModal({
-            isOpen: true,
-            title,
-            message
-        })
-    }
+    const { errorModal, showError, closeError } = useErrorModal()
 
     // 초기 프로필 데이터 불러오기
     useEffect(() => {
@@ -241,7 +230,7 @@ export default function MyPage() {
             {/* 에러 모달 배치 */}
             <ErrorModal
                 isOpen={errorModal.isOpen}
-                onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+                onClose={closeError}
                 title={errorModal.title}
                 message={errorModal.message}
             />
