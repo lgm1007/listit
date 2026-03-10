@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 interface ErrorModalState {
     isOpen: boolean
@@ -17,13 +17,13 @@ export function useErrorModal() {
         message: ''
     })
 
-    const showError = (message: string, title: string = '알림') => {
+    const showError = useCallback((message: string, title: string = '알림') => {
         setErrorModal({ isOpen: true, title, message })
-    }
+    }, [])
 
-    const closeError = () => {
+    const closeError = useCallback(() => {
         setErrorModal(prev => ({ ...prev, isOpen: false }))
-    }
+    }, [])
 
     return { errorModal, showError, closeError }
 }
