@@ -9,6 +9,7 @@ import { compressImage } from '@/utils/imageControl'
 import { handleAuthError } from '@/utils/authErrorHandler'
 import { CATEGORY_NAMES } from '../../../constants/categories'
 import ErrorModal from '@/src/components/ErrorModal'
+import { useErrorModal } from '@/src/hooks/useErrorModal'
 
 interface ItemImage {
     id: string
@@ -42,19 +43,7 @@ export default function EditPage() {
     const listId = params.id as string
     const supabase = createClient()
 
-    const [errorModal, setErrorModal] = useState({
-        isOpen: false,
-        title: '',
-        message: ''
-    })
-
-    const showError = (message: string, title: string = "알림") => {
-        setErrorModal({
-            isOpen: true,
-            title,
-            message
-        })
-    }
+    const { errorModal, showError, closeError } = useErrorModal()
 
     // 1. 메인 리스트 상태
     const [title, setTitle] = useState('')
@@ -475,7 +464,7 @@ export default function EditPage() {
             {/* 에러 모달 배치 */}
             <ErrorModal
                 isOpen={errorModal.isOpen}
-                onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+                onClose={closeError}
                 title={errorModal.title}
                 message={errorModal.message}
             />
