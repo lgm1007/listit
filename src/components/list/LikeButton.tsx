@@ -5,10 +5,13 @@ import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { handleAuthError } from '@/utils/authErrorHandler'
 import AuthModal from '@/src/components/AuthModal'
+import AlertModal from '@/src/components/AlertModal'
+import { useAlertModal } from '@/src/hooks/useAlertModal'
 
 export default function LikeButton({ listId }: { listId: string }) {
     const supabase = createClient()
     const router = useRouter()
+    const { alertModal, showError, closeAlert } = useAlertModal()
 
     const [isLiked, setIsLiked] = useState(false)
     const [likeCount, setLikeCount] = useState(0)
@@ -61,7 +64,7 @@ export default function LikeButton({ listId }: { listId: string }) {
             const handler = handleAuthError(result.error, router, `/list/${listId}`)
             if (handler) return // 로그인 페이지로 리다이렉팅 했으므로 종료
 
-            alert('좋아요 처리 중 오류가 발생했습니다.')
+            showError('좋아요 처리 중 오류가 발생했습니다.')
             return
         }
 
@@ -86,6 +89,13 @@ export default function LikeButton({ listId }: { listId: string }) {
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}
                 nextPath={`/list/${listId}`}
+            />
+            <AlertModal
+                isOpen={alertModal.isOpen}
+                onClose={closeAlert}
+                type={alertModal.type}
+                title={alertModal.title}
+                message={alertModal.message}
             />
         </>
     )

@@ -8,8 +8,8 @@ import { updateList } from './action'
 import { compressImage } from '@/utils/imageControl'
 import { handleAuthError } from '@/utils/authErrorHandler'
 import { CATEGORY_NAMES } from '../../../constants/categories'
-import ErrorModal from '@/src/components/ErrorModal'
-import { useErrorModal } from '@/src/hooks/useErrorModal'
+import AlertModal from '@/src/components/AlertModal'
+import { useAlertModal } from '@/src/hooks/useAlertModal'
 
 interface ItemImage {
     id: string
@@ -43,7 +43,7 @@ export default function EditPage() {
     const listId = params.id as string
     const supabase = createClient()
 
-    const { errorModal, showError, closeError } = useErrorModal()
+    const { alertModal, showError, showSuccess, closeAlert } = useAlertModal()
 
     // 1. 메인 리스트 상태
     const [title, setTitle] = useState('')
@@ -291,7 +291,7 @@ export default function EditPage() {
             const result = await updateList(listId, title, category, itemDataForServer)
 
             if (result.success) {
-                alert('리스트가 수정되었습니다.')
+                showSuccess('리스트가 수정되었습니다.')
                 router.push(`/list/${listId}`)
             } else {
                 showError('리스트 수정에 실패했습니다. 잠시 후 다시 시도해주세요.', '수정 실패')
@@ -462,11 +462,12 @@ export default function EditPage() {
             </form>
 
             {/* 에러 모달 배치 */}
-            <ErrorModal
-                isOpen={errorModal.isOpen}
-                onClose={closeError}
-                title={errorModal.title}
-                message={errorModal.message}
+            <AlertModal
+                isOpen={alertModal.isOpen}
+                onClose={closeAlert}
+                type={alertModal.type}
+                title={alertModal.title}
+                message={alertModal.message}
             />
         </main>
     )

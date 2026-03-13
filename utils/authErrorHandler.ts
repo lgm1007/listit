@@ -2,11 +2,19 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 
 /**
  * 에러를 처리하여 401(Unauthorized)인 경우 로그인 페이지로 리다이렉팅
+ * @param showAlert 선택적 콜백 — 전달 시 모달로 안내, 미전달 시 조용히 리다이렉트
  */
-export const handleAuthError = (error: any, router: AppRouterInstance, nextPath?: string) => {
+export const handleAuthError = (
+    error: any,
+    router: AppRouterInstance,
+    nextPath?: string,
+    showAlert?: (message: string) => void
+) => {
     // Supabase 401 에러 체크 또는 status가 401이거나 메시지에 Unauthorized 포함
     if (error?.status === 401 || error?.code === 'PGRST301' || error?.message?.includes('Unauthorized')) {
-        alert('세션이 만료되었거나 로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        if (showAlert) {
+            showAlert('세션이 만료되었거나 로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        }
         const redirectUrl = nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : '/login';
         router.push(redirectUrl);
         return true;
@@ -15,4 +23,4 @@ export const handleAuthError = (error: any, router: AppRouterInstance, nextPath?
     // 그 외 에러는 로그로 출력
     console.error('Unhandled Error:', error);
     return false;
-};
+};

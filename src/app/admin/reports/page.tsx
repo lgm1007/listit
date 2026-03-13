@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { Trash2, RotateCcw, AlertCircle } from 'lucide-react'
-import ErrorModal from '@/src/components/ErrorModal'
+import AlertModal from '@/src/components/AlertModal'
+import { useAlertModal } from '@/src/hooks/useAlertModal'
 
 interface Report {
     id: string;
@@ -20,23 +21,11 @@ interface Report {
 export default function AdminReportPage() {
     const supabase = createClient()
     const router = useRouter()
-    const [errorModal, setErrorModal] = useState({
-        isOpen: false,
-        title: '',
-        message: ''
-    })
+    const { alertModal, showError, showSuccess, closeAlert } = useAlertModal()
 
     const [reports, setReports] = useState<Report[]>([])
     const [loading, setLoading] = useState(true)
-    const [isAdmin, setIsAdmin] = useState<boolean | null>(null) // 관리자 여부 상태
-
-    const showError = (message: string, title: string = "알림") => {
-        setErrorModal({
-            isOpen: true,
-            title,
-            message
-        })
-    }
+    const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
 
     /**
      * 관리자 확인
@@ -102,7 +91,7 @@ export default function AdminReportPage() {
         // 2. 신고 처리 완료
         await supabase.from('reports').update({ status: 'reviewed' }).eq('id', reportId)
 
-        alert('복구되었습니다.')
+        showSuccess('복구되었습니다.')
         fetchReports()
     }
 
@@ -125,7 +114,7 @@ export default function AdminReportPage() {
         // 3. 신고 처리 완료
         await supabase.from('reports').update({ status: 'reviewed' }).eq('id', reportId)
 
-        alert('삭제 및 알림 전송이 완료되었습니다.')
+        showSuccess('삭제 및 알림 전송이 완료되었습니다.')
         fetchReports()
     }
 
@@ -184,11 +173,12 @@ export default function AdminReportPage() {
                     {reports.length === 0 && <div className="p-20 text-center text-gray-400">신고된 내역이 없습니다.</div>}
                 </div>
             </div>
-            <ErrorModal
-                isOpen={errorModal.isOpen}
-                title={errorModal.title}
-                message={errorModal.message}
-                onClose={() => setErrorModal({ isOpen: false, title: '', message: '' })}
+            <AlertModal
+                isOpen={alertModal.isOpen}
+                onClose={closeAlert}
+                type={alertModal.type}
+                title={alertModal.title}
+                message={alertModal.message}
             />
         </>
     )

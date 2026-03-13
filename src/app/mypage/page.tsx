@@ -6,8 +6,8 @@ import { uploadImage } from '@/utils/supabase/storage'
 import { compressImage } from '@/utils/imageControl'
 import { updateProfile } from './action'
 import { useRouter } from 'next/navigation'
-import ErrorModal from '@/src/components/ErrorModal'
-import { useErrorModal } from '@/src/hooks/useErrorModal'
+import AlertModal from '@/src/components/AlertModal'
+import { useAlertModal } from '@/src/hooks/useAlertModal'
 import ListSection from '@/src/components/mypage/ListSection'
 import { List } from '@/src/types/list'
 
@@ -31,7 +31,7 @@ export default function MyPage() {
     // 탭 상태
     const [activeTab, setActiveTab] = useState<'my' | 'liked'>('my')
 
-    const { errorModal, showError, closeError } = useErrorModal()
+    const { alertModal, showError, showSuccess, closeAlert } = useAlertModal()
 
     // 초기 프로필 데이터 불러오기
     useEffect(() => {
@@ -128,7 +128,7 @@ export default function MyPage() {
         const result = await updateProfile(formData)
 
         if (result.success) {
-            alert('프로필이 성공적으로 업데이트되었습니다.')
+            showSuccess('프로필이 성공적으로 업데이트되었습니다.')
             router.refresh()
         } else {
             showError(result.message || '저장에 실패했습니다.', '저장 실패')
@@ -228,11 +228,12 @@ export default function MyPage() {
             )}
 
             {/* 에러 모달 배치 */}
-            <ErrorModal
-                isOpen={errorModal.isOpen}
-                onClose={closeError}
-                title={errorModal.title}
-                message={errorModal.message}
+            <AlertModal
+                isOpen={alertModal.isOpen}
+                onClose={closeAlert}
+                type={alertModal.type}
+                title={alertModal.title}
+                message={alertModal.message}
             />
         </main>
     )
