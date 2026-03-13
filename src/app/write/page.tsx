@@ -8,8 +8,8 @@ import { saveList } from './action'
 import { compressImage } from '@/utils/imageControl'
 import { handleAuthError } from '@/utils/authErrorHandler'
 import { CATEGORY_NAMES } from '../../constants/categories'
-import ErrorModal from '@/src/components/ErrorModal'
-import { useErrorModal } from '@/src/hooks/useErrorModal'
+import AlertModal from '@/src/components/AlertModal'
+import { useAlertModal } from '@/src/hooks/useAlertModal'
 
 interface ListItemInput {
     title: string
@@ -25,7 +25,7 @@ export default function WritePage() {
     const router = useRouter()
     const supabase = createClient()
 
-    const { errorModal, showError, closeError } = useErrorModal()
+    const { alertModal, showError, showSuccess, closeAlert } = useAlertModal()
 
     // 1. 메인 리스트 상태
     const [title, setTitle] = useState('')
@@ -200,7 +200,7 @@ export default function WritePage() {
             const result = await saveList(title, category, itemDataForServer)
 
             if (result.success) {
-                alert('리스트가 등록되었습니다.')
+                showSuccess('리스트가 등록되었습니다.')
                 router.push('/')
             } else {
                 showError('리스트 저장에 실패했습니다. 잠시 후 다시 시도해주세요.', '저장 실패')
@@ -351,11 +351,12 @@ export default function WritePage() {
             </form>
 
             {/* 에러 모달 배치 */}
-            <ErrorModal
-                isOpen={errorModal.isOpen}
-                onClose={closeError}
-                title={errorModal.title}
-                message={errorModal.message}
+            <AlertModal
+                isOpen={alertModal.isOpen}
+                onClose={closeAlert}
+                type={alertModal.type}
+                title={alertModal.title}
+                message={alertModal.message}
             />
         </main>
     )

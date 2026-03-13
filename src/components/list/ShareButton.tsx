@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { Share2, Link as LinkIcon, MessageCircle } from 'lucide-react' // 아이콘 라이브러리
-import ErrorModal from '../ErrorModal'
+import AlertModal from '../AlertModal'
+import { useAlertModal } from '@/src/hooks/useAlertModal'
 
 interface ShareButtonProps {
     title: string
@@ -11,19 +12,7 @@ interface ShareButtonProps {
 }
 
 export default function ShareButton({ title, description, listId }: ShareButtonProps) {
-    const [errorModal, setErrorModal] = useState({
-        isOpen: false,
-        title: '',
-        message: ''
-    })
-
-    const showError = (message: string, title: string = "알림") => {
-        setErrorModal({
-            isOpen: true,
-            title,
-            message
-        })
-    }
+    const { alertModal, showError, showInfo, closeAlert } = useAlertModal()
 
     /**
      * 현재 페이지의 완전한 url 생성
@@ -58,7 +47,7 @@ export default function ShareButton({ title, description, listId }: ShareButtonP
 
         try {
             await navigator.clipboard.writeText(shareUrl)
-            alert('링크가 클립보드에 복사되었습니다!') // 나중에 토스트로 교체 추천
+            showInfo('링크가 클립보드에 복사되었습니다!')
         } catch (err) {
             showError('링크 복사에 실패했습니다.', '링크 복사 실패')
         }
@@ -137,11 +126,12 @@ export default function ShareButton({ title, description, listId }: ShareButtonP
                 </button>
             </div>
 
-            <ErrorModal
-                isOpen={errorModal.isOpen}
-                onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
-                title={errorModal.title}
-                message={errorModal.message}
+            <AlertModal
+                isOpen={alertModal.isOpen}
+                onClose={closeAlert}
+                type={alertModal.type}
+                title={alertModal.title}
+                message={alertModal.message}
             />
         </>
     )

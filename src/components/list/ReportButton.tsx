@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AlertTriangle } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
-import ErrorModal from '../ErrorModal'
+import AlertModal from '../AlertModal'
+import { useAlertModal } from '@/src/hooks/useAlertModal'
 
 interface ReportButtonProps {
     targetType: 'list' | 'comment'
@@ -15,19 +16,7 @@ interface ReportButtonProps {
 export default function ReportButton({ targetType, targetId, targetUserId }: ReportButtonProps) {
     const supabase = createClient()
     const router = useRouter()
-    const [errorModal, setErrorModal] = useState({
-        isOpen: false,
-        title: '',
-        message: ''
-    })
-
-    const showError = (message: string, title: string = "알림") => {
-        setErrorModal({
-            isOpen: true,
-            title,
-            message
-        })
-    }
+    const { alertModal, showError, showSuccess, closeAlert } = useAlertModal()
 
     const handleReport = async () => {
         // 0. 로그인 세션 확인
@@ -65,7 +54,7 @@ export default function ReportButton({ targetType, targetId, targetUserId }: Rep
 
             if (hideError) throw hideError
 
-            alert('신고가 접수되어 해당 콘텐츠가 숨김 처리되었습니다. 관리자 검토 후 조치될 예정입니다.')
+            showSuccess('신고가 접수되어 해당 콘텐츠가 숨김 처리되었습니다. 관리자 검토 후 조치될 예정입니다.')
             router.refresh() // UI 갱신을 위해 새로고침
 
         } catch (error) {
@@ -83,11 +72,12 @@ export default function ReportButton({ targetType, targetId, targetUserId }: Rep
             >
                 <AlertTriangle size={20} />
             </button>
-            <ErrorModal
-                isOpen={errorModal.isOpen}
-                title={errorModal.title}
-                message={errorModal.message}
-                onClose={() => setErrorModal({ isOpen: false, title: '', message: '' })}
+            <AlertModal
+                isOpen={alertModal.isOpen}
+                onClose={closeAlert}
+                type={alertModal.type}
+                title={alertModal.title}
+                message={alertModal.message}
             />
         </>
     )
