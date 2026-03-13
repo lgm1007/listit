@@ -14,6 +14,8 @@ export const handleAuthError = (
     if (error?.status === 401 || error?.code === 'PGRST301' || error?.message?.includes('Unauthorized')) {
         if (showAlert) {
             showAlert('세션이 만료되었거나 로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        } else {
+            alert('세션이 만료되었거나 로그인이 필요합니다. 로그인 페이지로 이동합니다.');
         }
         const redirectUrl = nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : '/login';
         router.push(redirectUrl);
@@ -23,4 +25,4 @@ export const handleAuthError = (
     // 그 외 에러는 로그로 출력
     console.error('Unhandled Error:', error);
     return false;
-};
+};
