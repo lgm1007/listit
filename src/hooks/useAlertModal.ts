@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { AlertType } from '@/src/components/AlertModal'
 
 interface AlertModalState {
@@ -20,25 +20,25 @@ export function useAlertModal() {
         message: ''
     })
 
-    const showAlert = (message: string, title: string = '', type: AlertType = 'info') => {
+    const showAlert = useCallback((message: string, title: string = '', type: AlertType = 'info') => {
         setAlertModal({ isOpen: true, type, title, message })
-    }
+    }, [])
 
-    const showSuccess = (message: string, title: string = '완료') => {
+    const showSuccess = useCallback((message: string, title: string = '완료') => {
         showAlert(message, title, 'success')
-    }
+    }, [showAlert])
 
-    const showError = (message: string, title: string = '오류 발생') => {
+    const showError = useCallback((message: string, title: string = '오류 발생') => {
         showAlert(message, title, 'error')
-    }
+    }, [showAlert])
 
-    const showInfo = (message: string, title: string = '안내') => {
+    const showInfo = useCallback((message: string, title: string = '안내') => {
         showAlert(message, title, 'info')
-    }
+    }, [showAlert])
 
-    const closeAlert = () => {
+    const closeAlert = useCallback(() => {
         setAlertModal(prev => ({ ...prev, isOpen: false }))
-    }
+    }, [])
 
     return { alertModal, showAlert, showSuccess, showError, showInfo, closeAlert }
 }
